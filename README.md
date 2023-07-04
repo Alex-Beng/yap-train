@@ -1,5 +1,12 @@
 <div align="center">
 
+
+# Yap-Train
+Just copy from Yas-Train,  see below
+</div>
+
+<div align="center">
+
 # Yas-Train
 Yet Another Genshin Impact Scanner  
 又一个原神圣遗物导出器
