@@ -13,6 +13,7 @@ from mona.nn import predict as predict_net
 from mona.nn.model2 import Model2
 
 import datetime
+from time import sleep
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -50,6 +51,9 @@ def validate(net, validate_loader):
             predict = predict_net(net, x)
             # print(predict)
             correct += sum([1 if predict[i] == label[i] else 0 for i in range(len(label))])
+            errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] ]
+            if len(errs):
+                print(errs)
             total += len(label)
 
     net.train()
@@ -130,6 +134,8 @@ def train():
             if (batch + 1) % print_per == 0:
                 tput = batch_size * batch / (cur_time - start_time).total_seconds()
                 print(f"{cur_time} e{epoch} #{batch} tput: {tput} loss: {loss.item()}")
+                # print("sleeping for a while")
+                # sleep(5)
 
             if (batch + 1) % save_per == 0:
                 print("Validating and checkpointing")
