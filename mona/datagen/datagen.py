@@ -117,13 +117,13 @@ def generate_image_sample():
     y = random.randint(0, 5)
 
     text = random_text()
-    # draw.text((x, y), text, color2, font=random.choice(fonts))
+    draw.text((x, y), text, color2, font=random.choice(fonts))
 
     # This would disable anit-aliasing
     # draw.fontmode = "1"
 
     # draw.text((20, 5), "虺雷之姿", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
-    draw.text((20, 5), "雷素%暴岩1,7.", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
+    # draw.text((20, 5), "雷素%暴岩1,7.", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
 
     img_processed = pre_process(img)
     return img, img_processed   
