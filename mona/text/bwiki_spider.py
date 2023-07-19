@@ -1,6 +1,15 @@
-# crawling Bwiki for material names
+'''
+crawling Bwiki for names
+1. materials
+2. artifacts
+3. NPCs
+4. operations
+5. charaters
 
-import json
+only 1&2 needed
+actually only 1 needed
+'''
+
 import requests
 from lxml import etree
 
