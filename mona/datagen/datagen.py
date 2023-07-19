@@ -6,7 +6,7 @@ from PIL import Image, ImageFont, ImageDraw
 from mona.text.artifact_name import random_artifact_name
 from mona.text.stat import random_sub_stat, random_main_stat_name, random_main_stat_value
 from mona.text.characters import random_equip
-from mona.text.material import random_material_name
+from mona.text.material import random_material_name, random_cant_hold_material
 from mona.config import config
 from mona.datagen.pre_process import pre_process
 

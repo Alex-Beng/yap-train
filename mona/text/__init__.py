@@ -15,8 +15,10 @@ for name in artifact_name:
 lexicon = sorted(list(lexicon))
 
 index_to_word = {
+    0: "-"
 }
 word_to_index = {
+    "-": 0
 }
 for index, word in enumerate(lexicon):
     index_to_word[index + 1] = word
@@ -25,4 +27,5 @@ for index, word in enumerate(lexicon):
 # 527 -> 980
 # 试试能不能收敛
 # train only material: 668
+# material + artifact: 876
 print(f"lexicon size: {len(word_to_index)}")
