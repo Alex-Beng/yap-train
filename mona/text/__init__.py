@@ -2,7 +2,6 @@ from .artifact_name import artifact_name
 from .stat import stat_name
 from .characters import characters_name
 from .material import material_names
-from .material import material_names
 
 
 lexicon = set({})
