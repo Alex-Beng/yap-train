@@ -6,6 +6,7 @@ from PIL import Image, ImageFont, ImageDraw
 from mona.text.artifact_name import random_artifact_name
 from mona.text.stat import random_sub_stat, random_main_stat_name, random_main_stat_value
 from mona.text.characters import random_equip
+from mona.text.material import random_material_name
 from mona.config import config
 from mona.datagen.pre_process import pre_process
 
@@ -29,10 +30,12 @@ def random_number():
 
 
 random_funcs = [random_artifact_name, random_main_stat_name, random_main_stat_value,
-                random_sub_stat, random_level, random_equip, random_artifact_count, random_number]
+                random_sub_stat, random_level, random_equip, random_artifact_count, random_number, 
+                random_material_name]
 # 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
 random_weights = [0.1, 0.05, 0.15,
-                  0.64, 0.02, 0.02, 0.1, 0.2]
+                  0.64, 0.02, 0.02, 0.1, 0.2,
+                  1.28]
 # random_funcs = [
 #     (random_artifact_name, 0.1),
 #     (random_main_stat_name, 0.05),
