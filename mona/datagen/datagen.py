@@ -29,23 +29,10 @@ def random_number():
     return f"{n}"
 
 
-random_funcs = [random_artifact_name, random_main_stat_name, random_main_stat_value,
-                random_sub_stat, random_level, random_equip, random_artifact_count, random_number, 
-                random_material_name]
+
+random_funcs = [random_artifact_name, random_material_name]
 # 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
-random_weights = [0.1, 0.05, 0.15,
-                  0.64, 0.02, 0.02, 0.1, 0.2,
-                  1.28]
-# random_funcs = [
-#     (random_artifact_name, 0.1),
-#     (random_main_stat_name, 0.05),
-#     (random_main_stat_value, 0.15),
-#     (random_sub_stat, 0.64),
-#     (random_level, 0.02),
-#     (random_equip, 0.02),
-#     (random_artifact_count, 0.1),
-#     # (random_number, 0.2)
-# ]
+random_weights = [0.3, 0.7]
 
 
 def rand_color_1():
