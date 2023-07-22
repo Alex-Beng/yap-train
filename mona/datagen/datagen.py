@@ -3,6 +3,7 @@ import os
 
 from PIL import Image, ImageFont, ImageDraw
 
+from mona.text import lexicon
 from mona.text.artifact_name import random_artifact_name
 from mona.text.stat import random_sub_stat, random_main_stat_name, random_main_stat_value
 from mona.text.characters import random_equip
@@ -89,9 +90,73 @@ def generate_image():
     thr = random.uniform(0.5, 0.6)
     img = pre_process(img, thr)
     # img = resize_to_32(img)
-    # print(img.size)
+    # print(img.size, text)
+    # exit()
+
     return img, text
 
+import pickle
+import cv2
+from PIL import Image
+
+genshin_x = pickle.load(open("../yap/x.pk", "rb"))
+genshin_y = pickle.load(open("../yap/y.pk", "rb"))
+assert(len(genshin_x) == len(genshin_y))
+print(f'genshin data len: {len(genshin_x)}')
+root_path = "../yap/dumps/"
+genshin_n = len(genshin_x)
+
+def text_all_in_lexicon(text):
+    for c in text:
+        if c not in lexicon:
+            return False
+    return True
+
+def generate_mix_image():
+
+    # 一半真实数据，一半生成数据
+    if random.random() < 0.5:        
+        idx = random.randint(0, genshin_n - 1)
+        text = genshin_y[idx]
+        while not text_all_in_lexicon(text):
+            idx = random.randint(0, genshin_n - 1)
+            text = genshin_y[idx]
+                
+        img = cv2.imread(f'{root_path}{genshin_x[idx]}_raw.jpg')
+        img = cv2.resize(img, (145, 32))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
+
+        
+
+        if text == '':
+            img_way = random.randint(1, 5)
+            if img_way == 1:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+            elif img_way == 2:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+            elif img_way == 3:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_DEFAULT, value=0)
+            elif img_way == 4:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REFLECT, value=0)
+            elif img_way == 5:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REPLICATE, value=0)    
+            
+            img = Image.fromarray(img)
+            return img, text
+        else:
+            img_way = random.randint(1, 2)
+            if img_way == 1:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+            elif img_way == 2:
+                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+            
+            img = Image.fromarray(img)
+            return img, text
+        
+    else:
+        return generate_image()
+    
 
 # Generate and return sample before/after pre_process
 def generate_image_sample():
@@ -104,13 +169,13 @@ def generate_image_sample():
     y = random.randint(0, 5)
 
     text = random_text()
-    draw.text((x, y), text, color2, font=random.choice(fonts))
+    # draw.text((x, y), text, color2, font=random.choice(fonts))
 
     # This would disable anit-aliasing
     # draw.fontmode = "1"
 
     # draw.text((20, 5), "虺雷之姿", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
-    # draw.text((20, 5), "雷素%暴岩1,7.", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
+    draw.text((20, 5), "归风佳酿节节庆热度", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
 
     img_processed = pre_process(img)
     return img, img_processed   

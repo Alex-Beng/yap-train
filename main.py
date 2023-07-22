@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 
 # from mona.text.stat import random_stat, random_value
-from mona.datagen.datagen import generate_image, generate_image_sample
+from mona.datagen.datagen import generate_image, generate_image_sample, generate_mix_image
 from train import train
 from mona.config import config
 
@@ -27,7 +27,8 @@ if __name__ == "__main__":
         y = []
         cnt = 0
         for _ in range(train_size):
-            im, text = generate_image()
+            # im, text = generate_image()
+            im, text = generate_mix_image()
             tensor = transforms.ToTensor()(im)
             tensor = torch.unsqueeze(tensor, dim=0)
             x.append(tensor)
@@ -44,7 +45,8 @@ if __name__ == "__main__":
         x = []
         y = []
         for _ in range(validate_size):
-            im, text = generate_image()
+            # im, text = generate_image()
+            im, text = generate_mix_image()
             tensor = transforms.ToTensor()(im)
             tensor = torch.unsqueeze(tensor, dim=0)
             x.append(tensor)

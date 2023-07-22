@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
 from mona.nn.svtr import SVTRNet
-from mona.datagen.datagen import generate_image
+from mona.datagen.datagen import generate_image, generate_mix_image
 from mona.config import config
 from mona.nn import predict as predict_net
 from mona.nn.model2 import Model2
@@ -191,6 +191,6 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, text = generate_image()
+        im, text = generate_mix_image()
         tensor = transforms.ToTensor()(im)
         return tensor, text
