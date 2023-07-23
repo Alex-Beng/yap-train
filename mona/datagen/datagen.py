@@ -2,6 +2,7 @@ import random
 import os
 
 from PIL import Image, ImageFont, ImageDraw
+import numpy as np
 
 from mona.text import lexicon
 from mona.text.artifact_name import random_artifact_name
@@ -12,7 +13,8 @@ from mona.config import config
 from mona.datagen.pre_process import pre_process
 
 # 4k分辨率最大对应84号字，900p分辨率最小对应18号字
-fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(15, 90)]
+# 这里需要固定字号
+fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(96, 104)]
 
 
 def random_level():
@@ -76,22 +78,30 @@ def generate_image():
     color1 = rand_color_1()
     color2 = rand_color_2()
 
-    img = Image.new("RGB", (1200, 120), color1)
+    # 通过控制初始画布的宽度来指定 字符宽度缩放
+    img = Image.new("RGB", (2000+ random.randint(-100, 100), 120), color1)
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
-    x = random.randint(0, 20)
-    y = random.randint(0, 5)
+
+    x = random.randint(10, 20)
+    y = random.randint(-20, 30)
 
     text = random_text()
+    text = "烹饪"
 
     draw.text((x, y), text, color2, font=random.choice(fonts))
 
-    # Random binarization thr to mimic various rendering
-    thr = random.uniform(0.5, 0.6)
-    img = pre_process(img, thr)
-    # img = resize_to_32(img)
-    # print(img.size, text)
+    # 使用大津法阈值
+    img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.resize(img, (384, 32))
+    cv2.threshold(img, 0, 255, cv2.THRESH_OTSU, img)
+    img = cv2.bitwise_not(img)
+    # cv2.imshow('img', img)
+    # cv2.waitKey()
+    # print(img.shape)
     # exit()
+    img = Image.fromarray(img)
 
     return img, text
 
