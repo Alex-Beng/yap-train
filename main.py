@@ -71,6 +71,6 @@ if __name__ == "__main__":
             os.mkdir(folder)
 
         for i in range(100):
-            im, img_processed = generate_image_sample()
-            im.save(f"samples/{i}_raw.png")
-            img_processed.save((f"samples/{i}_p.png"))
+            im, text = generate_mix_image()
+            im.save(f"samples/{i}_{text}.png")
+            # img_processed.save((f"samples/{i}_p.png"))

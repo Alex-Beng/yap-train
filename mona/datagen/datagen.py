@@ -109,11 +109,11 @@ import pickle
 import cv2
 from PIL import Image
 
-genshin_x = pickle.load(open("../yap/x.pk", "rb"))
-genshin_y = pickle.load(open("../yap/y.pk", "rb"))
+genshin_x = pickle.load(open("../yap/xx.pk", "rb"))
+genshin_y = pickle.load(open("../yap/yy.pk", "rb"))
 assert(len(genshin_x) == len(genshin_y))
 print(f'genshin data len: {len(genshin_x)}')
-root_path = "../yap/dumps/"
+root_path = "../yap/"
 genshin_n = len(genshin_x)
 
 def text_all_in_lexicon(text):
@@ -132,7 +132,7 @@ def generate_mix_image():
             idx = random.randint(0, genshin_n - 1)
             text = genshin_y[idx]
                 
-        img = cv2.imread(f'{root_path}{genshin_x[idx]}_raw.jpg')
+        img = cv2.imread(f'{root_path}{genshin_x[idx]}')
         img = cv2.resize(img, (145, 32))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
@@ -169,6 +169,7 @@ def generate_mix_image():
     
 
 # Generate and return sample before/after pre_process
+# 已弃用
 def generate_image_sample():
     color1 = rand_color_1()
     color2 = rand_color_2()
