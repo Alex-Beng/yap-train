@@ -85,11 +85,11 @@ def generate_image():
 
     x = random.randint(10, 20)
     y = random.randint(-20, 30)
-
+    # 模拟糟糕的阈值带来的粗笔画
+    sk_w = random.randint(0, 4)
     text = random_text()
-    text = "烹饪"
 
-    draw.text((x, y), text, color2, font=random.choice(fonts))
+    draw.text((x, y), text, color2, font=random.choice(fonts), stroke_width=sk_w)
 
     # 使用大津法阈值
     img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
