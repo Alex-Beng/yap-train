@@ -5,37 +5,44 @@ from PIL import Image, ImageFont, ImageDraw
 import numpy as np
 
 from mona.text import lexicon
-from mona.text.artifact_name import random_artifact_name
-from mona.text.stat import random_sub_stat, random_main_stat_name, random_main_stat_value
-from mona.text.characters import random_equip
-from mona.text.material import random_material_name, random_cant_hold_material
+from mona.text.artifact_name import random_monster_artifact_name, random_treasure_artifact_name, random_check_point_artifact_name
+from mona.text.characters import random_character_name
+from mona.text.domains import random_domain_name
+from mona.text.material import random_material_name
+from mona.text.operations import random_operation_name
+from mona.text.weapons import random_weapon_name
+
 from mona.config import config
 from mona.datagen.pre_process import pre_process
 
 # 4k分辨率最大对应84号字，900p分辨率最小对应18号字
-# 这里需要固定字号
+# Yap需要固定字号
 fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(96, 104)]
 
 
-def random_level():
-    return "+" + str(random.randint(0, 20))
 
 
-def random_artifact_count():
-    # Random here, for online learning
-    flag_ac = random.randint(0, 1500)
-    return f"圣遗物 {flag_ac}/1500"
-
-
-def random_number():
-    n = random.randint(0, 1000000000)
-    return f"{n}"
-
-
-
-random_funcs = [random_artifact_name, random_material_name]
+random_funcs = [
+    random_monster_artifact_name,
+    random_treasure_artifact_name,
+    random_check_point_artifact_name,
+    random_character_name,
+    random_domain_name,
+    random_material_name,
+    random_operation_name,
+    random_weapon_name,
+]
 # 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
-random_weights = [0.3, 0.7]
+random_weights = [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+]
 
 
 def rand_color_1():

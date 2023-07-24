@@ -1,6 +1,6 @@
 import random
 
-# Taveller is not included
+# 所有可能交互的角色，包括NPC
 characters_name = [
     "珐露珊",
     "流浪者",
@@ -69,8 +69,28 @@ characters_name = [
     "艾尔海森",
     "迪希雅",
     "米卡",
+
+    # 尘歌壶
+    "派蒙",
+    "阿圆",
+    
+    # 大世界，不想写爬虫了
+    # 写点常见的好了
+    "凯瑟琳",
+    "莎拉",
+    "优律",
+    "玛乔丽",
+    "瓦格纳",
+    "昆恩",
+    "芙罗拉",
+    "提米",
+    "蒂玛乌斯",
+    "布兰琪",
+    "艾琳",
+    "维克多",    
+    
 ]
 
 
-def random_equip():
-    return random.choice(characters_name) + "已装备"
+def random_character_name():
+    return random.choice(characters_name)

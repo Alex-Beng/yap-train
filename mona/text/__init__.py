@@ -1,16 +1,23 @@
-from .artifact_name import artifact_name
-from .stat import stat_name
+from .artifact_name import monster_artifact_name, check_point_artifact_names, treasure_artifact_names
 from .characters import characters_name
+from .domains import domain_names
 from .material import material_names
+from .operations import operations_names
+from .weapons import weapons_name
 
 
 lexicon = set({})
-for name in material_names:
+for name in monster_artifact_name \
+    + check_point_artifact_names \
+    + treasure_artifact_names \
+    + characters_name \
+    + domain_names \
+    + material_names \
+    + operations_names \
+    + weapons_name:
     for char in name:
         lexicon.add(char)
-for name in artifact_name:
-    for char in name:
-        lexicon.add(char)
+
 
 lexicon = sorted(list(lexicon))
 
@@ -24,8 +31,4 @@ for index, word in enumerate(lexicon):
     index_to_word[index + 1] = word
     word_to_index[word] = index + 1
 
-# 527 -> 980
-# 试试能不能收敛
-# train only material: 668
-# material + artifact: 876
 print(f"lexicon size: {len(word_to_index)}")
