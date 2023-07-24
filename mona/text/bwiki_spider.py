@@ -1,3 +1,4 @@
+# 已弃用
 '''
 crawling Bwiki for names
 1. materials
