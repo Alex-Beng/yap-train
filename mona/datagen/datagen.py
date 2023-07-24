@@ -114,10 +114,18 @@ def generate_image():
 
 import pickle
 import cv2
+import json
 from PIL import Image
 
-genshin_x = pickle.load(open("../yap/xx.pk", "rb"))
-genshin_y = pickle.load(open("../yap/yy.pk", "rb"))
+def js_dp(obj, path):
+    json.dump(obj, open(path, 'w', encoding='utf-8'), ensure_ascii=False)
+
+def js_ld(path):
+    return json.load(open(path, 'r', encoding='utf-8'))
+
+
+genshin_x = js_ld('../yap/xx.json')
+genshin_y = js_ld('../yap/yy.json')
 assert(len(genshin_x) == len(genshin_y))
 print(f'genshin data len: {len(genshin_x)}')
 root_path = "../yap/"
@@ -136,10 +144,13 @@ def generate_mix_image():
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
         while not text_all_in_lexicon(text):
+            print(f"[warning] {text} not in lexicon")
             idx = random.randint(0, genshin_n - 1)
             text = genshin_y[idx]
-                
-        img = cv2.imread(f'{root_path}{genshin_x[idx]}')
+        path = os.path.join(root_path, genshin_x[idx])
+        
+        img = Image.open(path)
+        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         img = cv2.resize(img, (145, 32))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
