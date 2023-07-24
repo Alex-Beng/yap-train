@@ -7,14 +7,15 @@ from .weapons import weapons_name
 
 
 lexicon = set({})
-for name in monster_artifact_name \
+ALL_NAMES = monster_artifact_name \
     + check_point_artifact_names \
     + treasure_artifact_names \
     + characters_name \
     + domain_names \
     + material_names \
     + operations_names \
-    + weapons_name:
+    + weapons_name
+for name in ALL_NAMES:
     for char in name:
         lexicon.add(char)
 
