@@ -51,8 +51,8 @@ if __name__ == "__main__":
             tensor = torch.unsqueeze(tensor, dim=0)
             x.append(tensor)
             y.append(text)
-            if cnt % 1000 == 0:
-                print(f'vali: {cnt} / {validate_size} {datetime.datetime.now()}')
+            # if cnt % 1000 == 0:
+            #     print(f'vali: {cnt} / {validate_size} {datetime.datetime.now()}')
 
         xx = torch.cat(x, dim=0)
         torch.save(xx, "data/validate_x.pt")
