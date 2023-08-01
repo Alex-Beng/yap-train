@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
         # generate sample
         for i in range(50):
-            im, text = generate_image()
+            im, text = generate_mix_image()
             im.save(f"data/sample_{i}.png")
     elif sys.argv[1] == "train":
         train()

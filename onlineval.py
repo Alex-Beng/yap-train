@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 from mona.text import index_to_word
 from mona.nn.model import Model
 from mona.nn.model2 import Model2
-from mona.datagen.datagen import generate_image
+from mona.datagen.datagen import generate_image, generate_mix_image
 from mona.config import config
 from mona.nn import predict as predict_net
 
@@ -31,7 +31,7 @@ class MyOnlineDataSet(Dataset):
         return self.size
 
     def __getitem__(self, index):
-        im, text = generate_image()
+        im, text = generate_mix_image()
         tensor = transforms.ToTensor()(im)
         return tensor, text
 
