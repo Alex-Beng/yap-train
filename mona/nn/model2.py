@@ -111,3 +111,11 @@ class Model2(nn.Module):
 
         x = F.log_softmax(x, dim=2)
         return x
+    def load_can_load(self, path):
+        pretrained_dict = torch.load(path, map_location='cpu')
+        model_dict = self.state_dict()
+        for k, v in pretrained_dict.items():
+            if k in model_dict and v.size() == model_dict[k].size():
+                # print(f"load {k}")
+                model_dict[k] = v
+        print(f"load model from {path}")
