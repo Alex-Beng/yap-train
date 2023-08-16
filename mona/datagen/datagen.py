@@ -126,6 +126,11 @@ def js_ld(path):
 
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
+
+# only save the empty label xys
+genshin_x = [genshin_x[i] for i in range(len(genshin_x)) if genshin_y[i] == '']
+genshin_y = [genshin_y[i] for i in range(len(genshin_y)) if genshin_y[i] == '']
+
 assert(len(genshin_x) == len(genshin_y))
 print(f'genshin data len: {len(genshin_x)}')
 root_path = "../yap/"
