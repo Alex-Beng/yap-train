@@ -53,8 +53,10 @@ operations_names = [
     "构筑「花庭」",
     "重置计分",
     "养鱼",
-    "离开「尘歌壶」"
+    "离开「尘歌壶」",
 
+    # 4.0 常用操作
+    "等待巡轨船",
 ]
 
 def random_operation_name():
