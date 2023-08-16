@@ -74,7 +74,7 @@ def train():
     #     out_channels=len(index_to_word)
     # ).to(device)
     if config["pretrain"]:
-        net.load_state_dict(torch.load(f"models/{config['pretrain_name']}"))
+        net.load_state_dict(torch.load(f"models/{config['pretrain_name']}", map_location=device))
 
     data_aug_transform = transforms.Compose([
         transforms.RandomApply([
