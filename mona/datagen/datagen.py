@@ -135,6 +135,14 @@ assert(len(genshin_x) == len(genshin_y))
 print(f'genshin data len: {len(genshin_x)}')
 root_path = "../yap/"
 genshin_n = len(genshin_x)
+# for speed up
+# 预读入加速训练 吞吐: 500->700
+genshin_y_imgs = []
+for i in range(genshin_n):
+    path = os.path.join(root_path, genshin_x[i])
+    with Image.open(path) as img:
+        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        genshin_y_imgs.append(img)
 
 def text_all_in_lexicon(text):
     for c in text:
@@ -149,14 +157,16 @@ def generate_mix_image():
     if random.random() < 0.5:        
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
-        while not text_all_in_lexicon(text):
-            print(f"[warning] {text} not in lexicon")
-            idx = random.randint(0, genshin_n - 1)
-            text = genshin_y[idx]
-        path = os.path.join(root_path, genshin_x[idx])
+        # while not text_all_in_lexicon(text):
+        #     print(f"[warning] {text} not in lexicon")
+        #     idx = random.randint(0, genshin_n - 1)
+        #     text = genshin_y[idx]
+
+        # path = os.path.join(root_path, genshin_x[idx])
         
-        img = Image.open(path)
-        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        img = genshin_y_imgs[idx]
+        # img = Image.open(path)
+        # img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         img = cv2.resize(img, (145, 32))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
