@@ -142,6 +142,7 @@ def train():
                 rate = validate(net, validate_loader)
                 print(f"{cur_time} rate: {rate * 100}%")
                 torch.save(net.state_dict(), f"models/model_training.pt")
+                torch.save(net.state_dict(), f"models/model_training_{batch+1}.pt")
                 if rate == 1:
                     torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
 
