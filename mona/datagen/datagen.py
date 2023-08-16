@@ -132,10 +132,6 @@ root_path = "../yap/"
 genshin_n = len(genshin_x)
 
 def text_all_in_lexicon(text):
-    if text != "":
-        return False
-    return True
-
     for c in text:
         if c not in lexicon:
             return False
