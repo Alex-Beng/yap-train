@@ -132,6 +132,10 @@ root_path = "../yap/"
 genshin_n = len(genshin_x)
 
 def text_all_in_lexicon(text):
+    if text != "":
+        return False
+    return True
+
     for c in text:
         if c not in lexicon:
             return False
@@ -140,6 +144,7 @@ def text_all_in_lexicon(text):
 def generate_mix_image():
 
     # 一半真实数据，一半生成数据
+    # 真实数据仅用空白数据
     if random.random() < 0.5:        
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
