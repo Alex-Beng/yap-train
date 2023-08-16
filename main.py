@@ -74,3 +74,11 @@ if __name__ == "__main__":
             im, text = generate_mix_image()
             im.save(f"samples/{i}_{text}.png")
             # img_processed.save((f"samples/{i}_p.png"))
+    elif sys.argv[1] == 'sample2':
+        folder = pathlib.Path("samples2")
+        if not folder.is_dir():
+            os.mkdir(folder)
+
+        for i in range(100):
+            im, text = generate_image_sample()
+            im.save(f"samples2/{i}.png")
