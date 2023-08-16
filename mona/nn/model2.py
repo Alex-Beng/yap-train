@@ -111,11 +111,15 @@ class Model2(nn.Module):
 
         x = F.log_softmax(x, dim=2)
         return x
-    def load_can_load(self, path):
-        pretrained_dict = torch.load(path, map_location='cpu')
-        model_dict = self.state_dict()
-        for k, v in pretrained_dict.items():
-            if k in model_dict and v.size() == model_dict[k].size():
-                # print(f"load {k}")
-                model_dict[k] = v
+    def load_can_load(self, path, device):
+        try:
+            self.load_state_dict(torch.load(path, map_location=device))
+        except Exception as e:
+            print("[warning] just load can load")
+            pretrained_dict = torch.load(path, map_location=device)
+            model_dict = self.state_dict()
+            for k, v in pretrained_dict.items():
+                if k in model_dict and v.size() == model_dict[k].size():
+                    # print(f"load {k}")
+                    model_dict[k] = v
         print(f"load model from {path}")
