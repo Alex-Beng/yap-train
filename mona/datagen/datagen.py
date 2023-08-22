@@ -31,18 +31,58 @@ random_funcs = [
     random_material_name,
     random_operation_name,
     random_weapon_name,
+    # hard code difficult name
+    lambda : random.choice(['瑶瑶', '绮良良', 
+                            '七七', '落落莓', 
+                            '墩墩桃', '调查',
+                            '泡泡桔', '嘟嘟莲',
+                            '甜甜花', '钩钩果',
+                            '松果', '松茸',
+                            '棱镜', '棱晶',
+                            '浊水的一掬', '浊水的一滴',
+                            "地脉的旧枝", "地脉的枯叶", "地脉的新芽", 
+                            '水晶蝶', '水晶块', '冰晶蝶', "晶蝶",
+                            '兽肉', '鱼肉',
+                            "蓝角蜥", "红角蜥", "绿角蜥", '角蜥',
+                            '隐兽指爪', '隐兽利爪',
+                            '荒性能量块', '芒性能量块',
+                            "落日鳅鳅", "金鳅鳅", "晴天鳅鳅", '鳅鳅',
+                            "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", '鳗鳗',
+                            '胡桃', '阅读',
+                            '黑晶号角', '黑铜号角',
+                            '召唤草种子', '召唤雷种子',
+                            "晦暗刻像", "幽邃刻像", "夤夜刻像",'刻像',
+                            '精锻用杂矿', '精锻用良矿', '精锻用魔矿', 
+                            ]),
+    # single word
+    lambda : random.randint(0, 5) * (' ') + random.choice(lexicon),
+    # twins word
+    lambda : random.randint(0, 4) * (' ') + random.choice(lexicon) * 2,
+    # 三字
+    lambda : random.randint(0, 3) * (' ') + random.choice(lexicon) * 3,
+    # 四字
+    lambda : random.randint(0, 2) * (' ') + random.choice(lexicon) * 4,
+    # dual word
+    lambda : random.randint(0, 4) * (' ') + random.choice(lexicon) + random.choice(lexicon),
 ]
 # 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
 random_weights = [
+    3,
     1,
     1,
     1,
     1,
+    5,
+    3,
     1,
     1,
-    1,
-    1,
+    # 0.6, 0.6, 0.6, 0.6, 0.6,
+    8, 8, 8, 8, 8
+
 ]
+
+random_funcs_genshin = random_funcs[:8]
+random_weights_genshin = random_weights[:8]
 
 
 def rand_color_1():
@@ -80,8 +120,18 @@ def random_text():
     return func[0]()
     # return random_artifact_count()
 
+# 仅生成原神中的names
+def random_text_genshin_distribute():
+    func = random.choices(
+        population=random_funcs_genshin,
+        weights=random_weights_genshin,
+        k=1
+    )
+    return func[0]()
 
-def generate_image():
+
+# 反射！反向控制！传入对象！JVAV！牛的不行！
+def generate_image(rand_func=random_text):
     color1 = rand_color_1()
     color2 = rand_color_2()
 
@@ -90,11 +140,11 @@ def generate_image():
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
 
-    x = random.randint(10, 20)
+    x = random.randint(10, 600)
     y = random.randint(-20, 30)
     # 模拟糟糕的阈值带来的粗笔画
-    sk_w = random.randint(0, 4)
-    text = random_text()
+    sk_w = random.randint(0, 2)
+    text = rand_func()
 
     draw.text((x, y), text, color2, font=random.choice(fonts), stroke_width=sk_w)
 
@@ -127,16 +177,26 @@ def js_ld(path):
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
 
+# 真实标签仅使用空白数据，无需验证lexicon
+def text_all_in_lexicon(text):
+    for c in text:
+        if c not in lexicon:
+            return False
+    return True
+
+genshin_x = [genshin_x[i] for i in range(len(genshin_x)) if text_all_in_lexicon(genshin_y[i])]
+genshin_y = [genshin_y[i] for i in range(len(genshin_y)) if text_all_in_lexicon(genshin_y[i])]
+
 # only save the empty label xys
-genshin_x = [genshin_x[i] for i in range(len(genshin_x)) if genshin_y[i] == '']
-genshin_y = [genshin_y[i] for i in range(len(genshin_y)) if genshin_y[i] == '']
+# genshin_x = [genshin_x[i] for i in range(len(genshin_x)) if genshin_y[i] == '']
+# genshin_y = [genshin_y[i] for i in range(len(genshin_y)) if genshin_y[i] == '']
 
 assert(len(genshin_x) == len(genshin_y))
 print(f'genshin data len: {len(genshin_x)}')
 root_path = "../yap/"
 genshin_n = len(genshin_x)
 # for speed up
-# 预读入加速训练 吞吐: 500->700
+# 预读入加速训练 吞吐: 500->550
 genshin_y_imgs = []
 for i in range(genshin_n):
     path = os.path.join(root_path, genshin_x[i])
@@ -144,13 +204,8 @@ for i in range(genshin_n):
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         genshin_y_imgs.append(img)
 
-def text_all_in_lexicon(text):
-    for c in text:
-        if c not in lexicon:
-            return False
-    return True
 
-def generate_mix_image():
+def generate_mix_image(rand_func=random_text):
 
     # 一半真实数据，一半生成数据
     # 真实数据仅用空白数据
@@ -199,7 +254,7 @@ def generate_mix_image():
             return img, text
         
     else:
-        return generate_image()
+        return generate_image(rand_func)
     
 
 # Generate and return sample before/after pre_process

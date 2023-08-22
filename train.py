@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
 from mona.nn.svtr import SVTRNet
-from mona.datagen.datagen import generate_image, generate_mix_image
+from mona.datagen.datagen import generate_image, generate_mix_image, random_text, random_text_genshin_distribute
 from mona.config import config
 from mona.nn import predict as predict_net
 from mona.nn.model2 import Model2
@@ -93,17 +93,18 @@ def train():
 
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
-
-    train_dataset = MyOnlineDataSet(config['train_size']) if config["online_train"] else MyDataSet(
+    only_genshin = True
+    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
-    validate_dataset = MyOnlineDataSet(config['validate_size']) if config["online_val"] else MyDataSet(
+    validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=only_genshin) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
     train_loader = DataLoader(train_dataset, shuffle=True, num_workers=config["dataloader_workers"], batch_size=config["batch_size"],)
     validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
 
-    # optimizer = optim.SGD(net.parameters(), lr=0.01)
+    # optimizer = optim.SGD(net.parameters(), lr=0.1)
     optimizer = optim.Adadelta(net.parameters())
+    # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
     epoch = config["epoch"]
@@ -143,7 +144,7 @@ def train():
                 rate = validate(net, validate_loader)
                 print(f"{cur_time} rate: {rate * 100}%")
                 torch.save(net.state_dict(), f"models/model_training.pt")
-                torch.save(net.state_dict(), f"models/model_training_{batch+1}.pt")
+                torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if rate == 1:
                     torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
 
@@ -185,14 +186,40 @@ class AddGaussianNoise(object):
 
 
 class MyOnlineDataSet(Dataset):
-    def __init__(self, size: int):
+    def __init__(self, size: int, is_val: bool=False):
         self.size = size
+        self.is_val = is_val
+        if is_val:
+            self.gen_func = random_text_genshin_distribute
+        else:
+            self.gen_func = random_text
 
+            
+        # 创建生成图像的协程
+        # 纯纯负提升吞吐量
+        # import asyncio
+        # self.queue = asyncio.Queue()
+        # self.loop = asyncio.get_event_loop()
+        # async def generate_image(queue):
+        #     while True:
+        #         im, text = generate_mix_image()
+        #         # im = transforms.ToTensor()(im)
+        #         while self.queue.qsize() > 600:
+        #             await asyncio.sleep(0.1)
+        #         await self.queue.put((im, text))
+        # self.loop.create_task(generate_image(self.queue))
+    def get_xy(self):
+        loop = self.loop
+        im, text = loop.run_until_complete(self.queue.get())
+        return im, text
     def __len__(self):
         return self.size
 
     def __getitem__(self, index):
         # Generate data online
-        im, text = generate_mix_image()
-        tensor = transforms.ToTensor()(im)
-        return tensor, text
+        im, text = generate_mix_image(self.gen_func)
+        # im, text = self.get_xy()
+        im = transforms.ToTensor()(im)
+        text = text.strip()
+
+        return im, text
