@@ -173,7 +173,14 @@ def js_dp(obj, path):
 def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
+# 使用pickle读入预先存放的arrays，省去随机读取的时间
+genshin_y_imgs = pickle.load(open('./genshin_y_imgs.pkl', 'rb'))
+genshin_y = pickle.load(open('./genshin_y.pkl', 'rb'))
 
+assert(len(genshin_y_imgs) == len(genshin_y))
+genshin_n = len(genshin_y)
+
+'''
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
 
@@ -203,7 +210,7 @@ for i in range(genshin_n):
     with Image.open(path) as img:
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         genshin_y_imgs.append(img)
-
+'''
 
 def generate_mix_image(rand_func=random_text):
 
