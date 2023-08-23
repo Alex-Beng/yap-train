@@ -74,7 +74,7 @@ operations_names = [
     '激活回响海螺',
     '呼叫升降机',
     '露景泉',
-    '露景泉',
+    '移动',
 ]
 
 def random_operation_name():
