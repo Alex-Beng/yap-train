@@ -73,4 +73,10 @@ yas生成的数据并不适用于yap自动拾取的场景。因为拾取场景
 
 `y.json`：image的标签
 
-# 环境配置，训练等与[yas-train](https://github.com/wormtql/yas-train)一致。
+# 环境配置
+
+与[yas-train](https://github.com/wormtql/yas-train)一致。
+
+# 训练
+
+见[train.md](./train.md)
