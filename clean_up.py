@@ -32,6 +32,8 @@ def js_ld(path):
 
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
+genshin_x = genshin_x[::-1]
+genshin_y = genshin_y[::-1]
 
 root_path = "../yap/"
 genshin_n = len(genshin_x)
@@ -43,7 +45,7 @@ parser.add_argument('model_file', type=str,
 args = parser.parse_args()
 model_file_path = args.model_file
 
-device = "cpu"
+device = "cuda"
 net = Model2(len(index_to_word), 1).to(device)
 net.load_state_dict(torch.load(
         model_file_path, map_location=torch.device(device)))
@@ -178,4 +180,45 @@ unpair: ../yap/dumps/15111_raw.jpg False
 unpair: ../yap/dumps/15198_raw.jpg False
 unpair: ../yap/dumps4.0/1477_2_异海凝_raw.jpg False
 unpair: ../yap/dumps4.0_tx/87_2_浊水的一_raw.jpg False
+'''
+
+'''
+unpair: ../yap/dumps/3277_raw.jpg
+unpair: ../yap/dumps/3676_raw.jpg
+unpair: ../yap/dumps/9280_raw.jpg
+unpair: ../yap/dumps/13528_raw.jpg
+unpair: ../yap/dumps/14751_raw.jpg
+unpair: ../yap/dumps/15050_raw.jpg
+unpair: ../yap/dumps/15165_raw.jpg
+unpair: ../yap/dumps/16160_raw.jpg
+unpair: ../yap/dumps/18382_raw.jpg
+unpair: ../yap/dumps/18384_raw.jpg
+unpair: ../yap/dumps/18401_raw.jpg
+阅读「圣章石」标签
+圣章石标签的
+e:\Dev\yap\dumps\18401_raw.jpg 
+e:\Dev\yap\dumps\18409_raw.jpg 
+e:\Dev\yap\dumps\18408_raw.jpg
+e:\Dev\yap\dumps\18407_raw.jpg 
+e:\Dev\yap\dumps\18406_raw.jpg 
+e:\Dev\yap\dumps\18405_raw.jpg 
+e:\Dev\yap\dumps\18404_raw.jpg 
+e:\Dev\yap\dumps\18403_raw.jpg 
+e:\Dev\yap\dumps\18402_raw.jpg
+蘑菇标签
+unpair: ../yap/dumps/18429_raw.jpg
+unpair: ../yap/dumps/19283_raw.jpg
+unpair: ../yap/dumps/19328_raw.jpg
+unpair: ../yap/text_dumps/21096_raw.jpg
+unpair: ../yap/text_dumps/23793_raw.jpg
+unpair: ../yap/text_dumps/24135_raw.jpg
+unpair: ../yap/dumps3/115_沉重号角_raw.jpg
+unpair: ../yap/dumps3/1765_祥箭_raw.jpg
+unpair: ../yap/dumps4.0_tx/54_3_浊水的_raw.jpg
+unpair: ../yap/dumps4.0_tx/56_2_浊水的一_raw.jpg
+unpair: ../yap/dumps4.0_tx/66_1_出生的浊水_raw.jpg
+'''
+
+'''
+unpair: ../yap/dumps4.0_tx4/498_2_「正义」的教_raw.jpg False
 '''
