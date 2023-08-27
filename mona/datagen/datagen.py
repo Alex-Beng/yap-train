@@ -237,36 +237,38 @@ def generate_mix_image(rand_func=random_text, ratio=0.5):
         img = genshin_y_imgs[idx]
         # img = Image.open(path)
         # img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-        img = cv2.resize(img, (145, 32))
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
 
+        # img = cv2.resize(img, (145, 32))
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
+        img = Image.fromarray(img)
+        return img, text
         
 
-        if text == '':
-            img_way = random.randint(1, 5)
-            if img_way == 1:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
-            elif img_way == 2:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
-            elif img_way == 3:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_DEFAULT, value=0)
-            elif img_way == 4:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REFLECT, value=0)
-            elif img_way == 5:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REPLICATE, value=0)    
+        # if text == '':
+        #     img_way = random.randint(1, 5)
+        #     if img_way == 1:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+        #     elif img_way == 2:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+        #     elif img_way == 3:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_DEFAULT, value=0)
+        #     elif img_way == 4:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REFLECT, value=0)
+        #     elif img_way == 5:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REPLICATE, value=0)    
             
-            img = Image.fromarray(img)
-            return img, text
-        else:
-            img_way = random.randint(1, 2)
-            if img_way == 1:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
-            elif img_way == 2:
-                img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+        #     img = Image.fromarray(img)
+        #     return img, text
+        # else:
+        #     img_way = random.randint(1, 2)
+        #     if img_way == 1:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+        #     elif img_way == 2:
+        #         img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
             
-            img = Image.fromarray(img)
-            return img, text
+        #     img = Image.fromarray(img)
+        #     return img, text
         
     else:
         return generate_image(rand_func)
