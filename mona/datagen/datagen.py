@@ -182,8 +182,11 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 # 使用pickle读入预先存放的arrays，省去随机读取的时间
-genshin_y_imgs = pickle.load(open('./genshin_y_imgs.pkl', 'rb'))
-genshin_y = pickle.load(open('./genshin_y.pkl', 'rb'))
+genshin_y_imgs = pickle.load(open('/media/alex/Data/genshin_y_imgs.pkl', 'rb'))
+genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
+# genshin_y_imgs = pickle.load(open('D:/genshin_y_imgs.pkl', 'rb'))
+# genshin_y = pickle.load(open('D:/genshin_y.pkl', 'rb'))
+
 
 assert(len(genshin_y_imgs) == len(genshin_y))
 genshin_n = len(genshin_y)
