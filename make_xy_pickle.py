@@ -37,13 +37,33 @@ root_path = "../yap/"
 genshin_n = len(genshin_x)
 # for speed up
 # 预读入加速训练 吞吐: 500->550
+genshin_y_new = []
 genshin_y_imgs = []
 for i in range(genshin_n):
     path = os.path.join(root_path, genshin_x[i])
     with Image.open(path) as img:
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-        genshin_y_imgs.append(img)
+        img = cv2.resize(img, (145, 32))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
+        text = genshin_y[i]
+        if text == '':
+            img0 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+            img1 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+            img2 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_DEFAULT, value=0)
+            img3 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REFLECT, value=0)
+            img4 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_REPLICATE, value=0)
+            for i in range(5):
+                genshin_y_new.append(text)
+                genshin_y_imgs.append(eval(f'img{i}'))
+        else:
+            img0 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=0)
+            img1 = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+            for i in range(2):
+                genshin_y_new.append(text)
+                genshin_y_imgs.append(eval(f'img{i}'))
 
 # 直接pickle避免多次随机读取
-pickle.dump(genshin_y_imgs, open('./genshin_y_imgs.pkl', 'wb'))
-pickle.dump(genshin_y, open('./genshin_y.pkl', 'wb'))
+pickle.dump(genshin_y_imgs, open('/media/alex/Data/genshin_y_imgs.pkl', 'wb'))
+pickle.dump(genshin_y_new, open('/media/alex/Data/genshin_y.pkl', 'wb'))
+# pickle.dump(genshin_y, open('./genshin_y.pkl', 'wb'))
