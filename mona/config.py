@@ -17,4 +17,9 @@ config = {
     # Generate data online for train/val
     "online_train": True,
     "online_val": True,
+
+    # data distribution: genshin / genshin+word 
+    "data_only_genshin": True,
+    # 生成混合数据时标注数据比例
+    "data_genshin_ratio": 0.3,
 }

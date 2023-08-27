@@ -93,8 +93,8 @@ def train():
 
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
-    only_genshin = True
-    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin) if config["online_train"] else MyDataSet(
+    only_genshin = config['data_only_genshin']
+    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin, ratio=config['data_genshin_ratio']) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
     validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=only_genshin) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
@@ -186,13 +186,14 @@ class AddGaussianNoise(object):
 
 
 class MyOnlineDataSet(Dataset):
-    def __init__(self, size: int, is_val: bool=False):
+    def __init__(self, size: int, is_val: bool=False, ratio: float=0.5):
         self.size = size
         self.is_val = is_val
         if is_val:
             self.gen_func = random_text_genshin_distribute
         else:
             self.gen_func = random_text
+        self.rt = ratio
 
             
         # 创建生成图像的协程
@@ -217,7 +218,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, text = generate_mix_image(self.gen_func)
+        im, text = generate_mix_image(self.gen_func, self.rt)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
         text = text.strip()

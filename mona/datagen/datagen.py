@@ -212,11 +212,11 @@ for i in range(genshin_n):
         genshin_y_imgs.append(img)
 '''
 
-def generate_mix_image(rand_func=random_text):
+def generate_mix_image(rand_func=random_text, ratio=0.5):
 
     # 一半真实数据，一半生成数据
     # 真实数据仅用空白数据
-    if random.random() < 0.5:        
+    if random.random() < ratio:
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
         # while not text_all_in_lexicon(text):
