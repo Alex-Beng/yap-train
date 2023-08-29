@@ -153,6 +153,10 @@ def generate_image(rand_func=random_text):
     # 模拟糟糕的阈值带来的粗笔画
     sk_w = random.randint(0, 2)
     text = rand_func()
+    if random.random() < 0.5:
+        text = text[:-1] if text != '' else text
+    # if random.random() < 0.3:
+    #     text = text[::-1]
 
     draw.text((x, y), text, color2, font=random.choice(fonts), stroke_width=sk_w)
 
