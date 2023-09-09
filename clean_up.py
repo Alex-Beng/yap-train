@@ -1,6 +1,7 @@
 # 使用合成数据训练好的模型来清理数据
 import random
 import os
+import time
 from copy import deepcopy
 
 from PIL import Image, ImageFont, ImageDraw
@@ -32,8 +33,8 @@ def js_ld(path):
 
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
-genshin_x = genshin_x[::-1]
-genshin_y = genshin_y[::-1]
+# genshin_x = genshin_x[::-1]
+# genshin_y = genshin_y[::-1]
 
 root_path = "../yap/"
 genshin_n = len(genshin_x)
@@ -46,12 +47,20 @@ args = parser.parse_args()
 model_file_path = args.model_file
 
 device = "cuda"
+device = "cpu"
 net = Model2(len(index_to_word), 1).to(device)
 net.load_state_dict(torch.load(
         model_file_path, map_location=torch.device(device)))
 net.eval()
 with torch.no_grad():
+    begin_time = time.time()
     for i in range(genshin_n):
+        if i%100 == 0 and i != 0:
+            end_time = time.time()
+            tput = 100/(end_time-begin_time)
+            begin_time = end_time
+            #  保留两位精度
+            print(f"i={i} tput={tput:.2f}", end='\r')
         path = os.path.join(root_path, genshin_x[i])
         with Image.open(path) as img:
             img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -221,4 +230,8 @@ unpair: ../yap/dumps4.0_tx/66_1_出生的浊水_raw.jpg
 
 '''
 unpair: ../yap/dumps4.0_tx4/498_2_「正义」的教_raw.jpg False
+'''
+
+'''
+unpair: ../yap/dumps4.0_tx7/140_2_珊瑚真珠_raw.jpg False
 '''
