@@ -22,16 +22,22 @@ def get_html(url):
         r.encoding=r.apparent_encoding
         return r.text
     except:
+        print("wrong")
         return ""
 
 
 if __name__ == "__main__":
-    html = get_html("https://wiki.biligame.com/ys/材料图鉴")
+    html = get_html("https://wiki.biligame.com/ys/兰那罗")
     html = etree.HTML(html)
-    material_as = html.xpath('//*[@id="mw-content-text"]//div[@class="ys-iconLarge"]/a[1]')
-    material_names = [a.get('title') for a in material_as]
+    material_as = html.xpath('//*[@id="mw-content-text"]//td/a[1]/text()')
+    # //*[@id="CardSelectTr"]/tbody/tr[1]/td[1]/a
+    # 
+    # 材料图鉴              //*[@id="mw-content-text"]//div[@class="ys-iconLarge"]/a[1]
+    # npc, 除了第一个龙二   //*[@id="frameNpc"]//div[@class="giconCard"]/a[1] 
+    print(len(material_as))
+    material_names = [a for a in material_as]
     # save to python file
-    with open('./material_names.py', 'w', encoding='utf-8') as f:
+    with open('./lan_names.py', 'w', encoding='utf-8') as f:
         f.write(f'material_names = {material_names}')
     # print(len(material_as), type(material_as[0]), type(material_as))
 
