@@ -1,4 +1,4 @@
-from mona.text import lexicon
+from mona.text import lexicon, ALL_NAMES
 
 import pickle
 import os
@@ -13,12 +13,15 @@ def js_dp(obj, path):
 def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
+ALL_NAMES = set(ALL_NAMES)
 
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
 
 # 真实标签仅使用空白数据，无需验证lexicon
 def text_all_in_lexicon(text):
+    if text not in ALL_NAMES:
+        return False
     for c in text:
         if c not in lexicon:
             return False
