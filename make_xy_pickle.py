@@ -43,22 +43,24 @@ for i in range(genshin_n):
     path = os.path.join(root_path, genshin_x[i])
     with Image.open(path) as img:
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-        img = cv2.resize(img, (221, 32))
+        r, c = img.shape[:2]
+        new_c = int(c/r*32 + 0.5)
+        img = cv2.resize(img, (new_c, 32))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
         text = genshin_y[i]
         if text == '':
-            img0 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=0)
-            img1 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=255)
-            img2 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_DEFAULT, value=0)
-            img3 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_REFLECT, value=0)
-            img4 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_REPLICATE, value=0)
+            img0 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=0)
+            img1 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=255)
+            img2 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_DEFAULT, value=0)
+            img3 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REFLECT, value=0)
+            img4 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REPLICATE, value=0)
             for i in range(5):
                 genshin_y_new.append(text)
                 genshin_y_imgs.append(eval(f'img{i}'))
         else:
-            img0 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=0)
-            img1 = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=255)
+            img0 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=0)
+            img1 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=255)
             for i in range(2):
                 genshin_y_new.append(text)
                 genshin_y_imgs.append(eval(f'img{i}'))
