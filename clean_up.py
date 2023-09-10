@@ -65,10 +65,10 @@ with torch.no_grad():
         with Image.open(path) as img:
             img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-            img = cv2.resize(img, (145, 32))
+            img = cv2.resize(img, (221, 32))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
-            img = cv2.copyMakeBorder(img, 0,0,0,384-145, cv2.BORDER_CONSTANT, value=255)
+            img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=255)
             img_cv = deepcopy(img)
             img = Image.fromarray(img)
             
