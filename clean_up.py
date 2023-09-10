@@ -12,6 +12,7 @@ from mona.nn.model2 import Model2
 
 from mona.nn import predict as predict_net
 
+import pickle
 import cv2
 import json
 from PIL import Image
@@ -31,10 +32,13 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 
-genshin_x = js_ld('../yap/xx.json')
-genshin_y = js_ld('../yap/yy.json')
-# genshin_x = genshin_x[::-1]
-# genshin_y = genshin_y[::-1]
+genshin_x = pickle.load(open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
+genshin_x_path = pickle.load(open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
+genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
+
+genshin_x = genshin_x[::-1]
+genshin_x_path = genshin_x_path[::-1]
+genshin_y = genshin_y[::-1]
 
 root_path = "../yap/"
 genshin_n = len(genshin_x)
@@ -61,29 +65,23 @@ with torch.no_grad():
             begin_time = end_time
             #  保留两位精度
             print(f"i={i} tput={tput:.2f}", end='\r')
-        path = os.path.join(root_path, genshin_x[i])
-        with Image.open(path) as img:
-            img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-            r, c = img.shape[:2]
-            new_c = int(c/r*32 + 0.5)
-            img = cv2.resize(img, (new_c, 32))
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
-            img = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=255)
-            img_cv = deepcopy(img)
-            img = Image.fromarray(img)
-            
-            im = transforms.ToTensor()(img)
-            # 变为 (1, 1, 32, 384)
-            im = im.unsqueeze(0)
-            im = im.to(device)
-            predict = predict_net(net, im)[0]
-            if predict != genshin_y[i]:
-                print(f"unpair: {path} {predict==genshin_y[i]}\n =={predict}== vs =={genshin_y[i]}==")
-                cv2.imshow("unpair", img_cv)
-                k = cv2.waitKey(0)
-                if k == ord('q'):
-                    exit()
+        # path = os.path.join(root_path, genshin_x[i])
+        path = genshin_x_path[i]
+
+        img = genshin_x[i]
+        img_cv = deepcopy(img)
+        img = Image.fromarray(img)
+        im = transforms.ToTensor()(img)
+        im = im.unsqueeze(0)
+        im = im.to(device)
+        predict = predict_net(net, im)[0]
+
+        if predict != genshin_y[i]:
+            print(f"unpair: {path} {predict==genshin_y[i]}\n =={predict}== vs =={genshin_y[i]}==")
+            cv2.imshow("unpair", img_cv)
+            k = cv2.waitKey(0)
+            if k == ord('q'):
+                exit()
 
 # wrong label
 '''
@@ -235,4 +233,9 @@ unpair: ../yap/dumps4.0_tx4/498_2_「正义」的教_raw.jpg False
 
 '''
 unpair: ../yap/dumps4.0_tx7/140_2_珊瑚真珠_raw.jpg False
+'''
+
+'''
+dumps/3295_raw.jpg
+text_dumps/14454_raw.jpg
 '''
