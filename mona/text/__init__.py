@@ -23,10 +23,10 @@ for name in ALL_NAMES:
 lexicon = sorted(list(lexicon))
 
 index_to_word = {
-    0: "-"
+    0: "/"
 }
 word_to_index = {
-    "-": 0
+    "/": 0
 }
 for index, word in enumerate(lexicon):
     index_to_word[index + 1] = word
