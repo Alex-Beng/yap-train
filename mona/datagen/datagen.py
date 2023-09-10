@@ -41,9 +41,19 @@ random_funcs = [
                             '棱镜', '棱晶',
                             '孢子', '种子',
                             '班尼特', '琳妮特',
-                            "驾驶浪船",
+                            "驾驶浪船", '浪船',
+                            '云堇',
+                            '凝光',
                             "太山府",
-
+                            '玛格丽特', '玛格丽',
+                            '齐格芙丽雅',
+                            # '「」', '」', '「',
+                            '「清心」的种子', '清心',
+                            '「金鱼草」的种子', 
+                            '「蘑菇」的孢子', 
+                            '「绝云椒椒」的种子',
+                            
+                            '箭簇',
                             '浊水的一','浊水的一','浊水的一',
                             '浊水的一掬', '浊水的一滴','浊水的一掬', '浊水的一滴','浊水的一掬', '浊水的一滴',
                             "地脉的旧枝", "地脉的枯叶", "地脉的新芽",
@@ -61,6 +71,15 @@ random_funcs = [
                             '召唤草种子', '召唤雷种子',
                             "晦暗刻像", "幽邃刻像", "夤夜刻像",'刻像',
                             '精锻用杂矿', '精锻用良矿', '精锻用魔矿', '精锻用', '魔矿', '良矿', '杂矿',
+                            "编号Hu-42318的记录",
+                            "编号Hu-96917的记录",
+                            "编号Hu-31122的记录",
+                            "编号GN-Hu-68513的记录",
+                            "编号Hu-16180的记录",
+                            "编号Hu-73011的记录",
+                            "编号Hu-81122的记录",
+                            "编号Hu-21030的记录",
+                            "编号Hu-57104的记录",
                             ]),
     # single word
     lambda : random.randint(0, 5) * (' ') + random.choice(lexicon),
@@ -78,12 +97,11 @@ random_weights = [
     3,
     1,
     1,
-    1,
-    1,
-    5,
+    6,
+    2,
+    6,
     3,
-    1,
-    1,
+    2,
     # 0.6, 0.6, 0.6, 0.6, 0.6,
     8, 8, 8, 8, 8, 8
 
@@ -153,8 +171,11 @@ def generate_image(rand_func=random_text):
     # 模拟糟糕的阈值带来的粗笔画
     sk_w = random.randint(0, 2)
     text = rand_func()
-    if random.random() < 0.5:
+    rd_num = random.random()
+    if rd_num < 0.3:
         text = text[:-1] if text != '' else text
+    elif rd_num > 0.7:
+        text = text[1:] if text != '' else text
     # if random.random() < 0.3:
     #     text = text[::-1]
 
@@ -186,13 +207,13 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 # 使用pickle读入预先存放的arrays，省去随机读取的时间
-genshin_y_imgs = pickle.load(open('/media/alex/Data/genshin_y_imgs.pkl', 'rb'))
+genshin_x_imgs = pickle.load(open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
 genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
-# genshin_y_imgs = pickle.load(open('D:/genshin_y_imgs.pkl', 'rb'))
+# genshin_x_imgs = pickle.load(open('D:/genshin_x_imgs.pkl', 'rb'))
 # genshin_y = pickle.load(open('D:/genshin_y.pkl', 'rb'))
 
 
-assert(len(genshin_y_imgs) == len(genshin_y))
+assert(len(genshin_x_imgs) == len(genshin_y))
 genshin_n = len(genshin_y)
 
 '''
@@ -219,12 +240,12 @@ root_path = "../yap/"
 genshin_n = len(genshin_x)
 # for speed up
 # 预读入加速训练 吞吐: 500->550
-genshin_y_imgs = []
+genshin_x_imgs = []
 for i in range(genshin_n):
     path = os.path.join(root_path, genshin_x[i])
     with Image.open(path) as img:
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-        genshin_y_imgs.append(img)
+        genshin_x_imgs.append(img)
 '''
 
 def generate_mix_image(rand_func=random_text, ratio=0.5):
@@ -241,7 +262,7 @@ def generate_mix_image(rand_func=random_text, ratio=0.5):
 
         # path = os.path.join(root_path, genshin_x[idx])
         
-        img = genshin_y_imgs[idx]
+        img = genshin_x_imgs[idx]
         # img = Image.open(path)
         # img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
