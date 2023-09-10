@@ -36,9 +36,9 @@ genshin_x = pickle.load(open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
 genshin_x_path = pickle.load(open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
 genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
 
-genshin_x = genshin_x[::-1]
-genshin_x_path = genshin_x_path[::-1]
-genshin_y = genshin_y[::-1]
+# genshin_x = genshin_x[::-1]
+# genshin_x_path = genshin_x_path[::-1]
+# genshin_y = genshin_y[::-1]
 
 root_path = "../yap/"
 genshin_n = len(genshin_x)
@@ -51,14 +51,15 @@ args = parser.parse_args()
 model_file_path = args.model_file
 
 device = "cuda"
-device = "cpu"
+# device = "cpu"
 net = Model2(len(index_to_word), 1).to(device)
 net.load_state_dict(torch.load(
         model_file_path, map_location=torch.device(device)))
 net.eval()
 with torch.no_grad():
     begin_time = time.time()
-    for i in range(genshin_n):
+    i = 0
+    while i < genshin_n:
         if i%100 == 0 and i != 0:
             end_time = time.time()
             tput = 100/(end_time-begin_time)
@@ -82,6 +83,10 @@ with torch.no_grad():
             k = cv2.waitKey(0)
             if k == ord('q'):
                 exit()
+        if genshin_y[i] == '':
+            i += 5
+        else:
+            i += 2
 
 # wrong label
 '''
@@ -236,6 +241,8 @@ unpair: ../yap/dumps4.0_tx7/140_2_珊瑚真珠_raw.jpg False
 '''
 
 '''
-dumps/3295_raw.jpg
-text_dumps/14454_raw.jpg
+dumps/15031_raw.jpg
+dumps/15049_raw.jpg
+text_dumps/1397_raw.jpg
+dumps4.0_xs/107_2_蕈兽孢子_raw.jpg
 '''
