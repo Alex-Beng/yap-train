@@ -172,9 +172,9 @@ def generate_image(rand_func=random_text):
     sk_w = random.randint(0, 2)
     text = rand_func()
     rd_num = random.random()
-    if rd_num < 0.3:
+    if rd_num < 0.3 and len(text) > 3:
         text = text[:-1] if text != '' else text
-    elif rd_num > 0.7:
+    elif rd_num > 0.7 and len(text) > 3:
         text = text[1:] if text != '' else text
     # if random.random() < 0.3:
     #     text = text[::-1]
