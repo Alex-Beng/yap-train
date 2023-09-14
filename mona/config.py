@@ -4,7 +4,7 @@ config = {
     "batch_size": 512, # 550 on 4GB gpu memo
     "epoch": 1000,
     "print_per": 10,
-    "save_per": 800,
+    "save_per": 400,
 
     "train_size": 200000,
     "validate_size": 30000,
