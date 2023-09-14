@@ -114,6 +114,7 @@ def train():
     start_time = datetime.datetime.now()
     for epoch in range(epoch):
         for x, label in train_loader:
+            # sleep(10)
             optimizer.zero_grad()
             target_vector, target_lengths = get_target(label)
             target_vector, target_lengths = target_vector.to(device), target_lengths.to(device)
@@ -133,13 +134,13 @@ def train():
 
             cur_time = datetime.datetime.now()
 
-            if (batch + 1) % print_per == 0:
+            if batch % print_per == 0 and batch != 0:
                 tput = batch_size * batch / (cur_time - start_time).total_seconds()
                 print(f"{cur_time} e{epoch} #{batch} tput: {tput} loss: {loss.item()}")
                 # print("sleeping for a while")
                 # sleep(5)
 
-            if (batch + 1) % save_per == 0:
+            if batch % save_per == 0 and batch != 0:
                 print("Validating and checkpointing")
                 rate = validate(net, validate_loader)
                 print(f"{cur_time} rate: {rate * 100}%")
