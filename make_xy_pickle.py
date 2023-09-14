@@ -20,7 +20,7 @@ genshin_y = js_ld('../yap/yy.json')
 
 # 真实标签仅使用空白数据，无需验证lexicon
 def text_all_in_lexicon(text):
-    if text not in ALL_NAMES:
+    if text != "" and text not in ALL_NAMES:
         return False
     for c in text:
         if c not in lexicon:
