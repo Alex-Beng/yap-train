@@ -81,7 +81,7 @@ class Model2(nn.Module):
         self.pe = PositionalEncoding(dim=hidden_channels, length=24)
 
         # 添加一个batchnorm
-        self.bm = nn.BatchNorm1d(24)
+        # self.bm = nn.BatchNorm1d(24)
         # 添加一个dropout
         # self.dp = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
@@ -107,7 +107,7 @@ class Model2(nn.Module):
         # print(x.shape)
         x = x.squeeze(2).permute((0, 2, 1))
         x = self.pe(x)
-        x = self.bm(x)
+        # x = self.bm(x)
         # x = self.dp(x)
         x = self.linear1(x)
         x = self.blocks(x)
@@ -119,13 +119,14 @@ class Model2(nn.Module):
         return x
     def load_can_load(self, path, device):
         try:
-            self.load_state_dict(torch.load(path, map_location=device))
+            self.load_state_dict(torch.load(path, map_location=device), strict=False)
         except Exception as e:
             print("[warning] just load can load")
             pretrained_dict = torch.load(path, map_location=device)
             model_dict = self.state_dict()
             for k, v in pretrained_dict.items():
                 if k in model_dict and v.size() == model_dict[k].size():
-                    # print(f"load {k}")
                     model_dict[k] = v
+                elif k in model_dict and v.size() != model_dict[k].size():
+                    print(f"size dismatch: {k}, {v.size()} -> {model_dict[k].size()}")
         print(f"load model from {path}")
