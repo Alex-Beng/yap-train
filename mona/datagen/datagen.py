@@ -52,6 +52,14 @@ random_funcs = [
                             '「金鱼草」的种子', 
                             '「蘑菇」的孢子', 
                             '「绝云椒椒」的种子',
+                            "「塞西莉亚花」的种子",
+                            "大英雄的经",
+                            '阿汉格尔','孙宇',
+                            '菲尔戈黛', '菲尔戈黛特',
+                            '茉洁草',
+                            '汝英',
+                            '大久保大',
+                            '莎莎妮',
                             
                             '箭簇',
                             '浊水的一','浊水的一','浊水的一',
@@ -73,13 +81,17 @@ random_funcs = [
                             '精锻用杂矿', '精锻用良矿', '精锻用魔矿', '精锻用', '魔矿', '良矿', '杂矿',
                             "编号Hu-42318的记录",
                             "编号Hu-96917的记录",
-                            "编号Hu-31122的记录",
+                            "编号Hu-31122的记录","编号Hu-31122的记录","编号Hu-31122的记录",
+                            "编号Hu-31122的记","编号Hu-31122的记","编号Hu-31122的记",
                             "编号GN-Hu-68513的记录",
                             "编号Hu-16180的记录",
                             "编号Hu-73011的记录",
-                            "编号Hu-81122的记录",
+                            "编号Hu-81122的记录","编号Hu-81122的记录","编号Hu-81122的记录",
                             "编号Hu-21030的记录",
                             "编号Hu-57104的记录",
+                            '？？？', 
+                            '流放者头冠',
+                            '卡斯帕',
                             ]),
     # single word
     lambda : random.randint(0, 5) * (' ') + random.choice(lexicon),
@@ -166,16 +178,16 @@ def generate_image(rand_func=random_text):
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
 
-    x = random.randint(10, 600)
-    y = random.randint(-20, 30)
+    x = random.randint(10, 300)
+    y = random.randint(-15, 25)
     # 模拟糟糕的阈值带来的粗笔画
     sk_w = random.randint(0, 2)
     text = rand_func()
     rd_num = random.random()
     if rd_num < 0.3 and len(text) > 3:
         text = text[:-1] if text != '' else text
-    elif rd_num > 0.7 and len(text) > 3:
-        text = text[1:] if text != '' else text
+    # elif rd_num > 0.7 and len(text) > 3:
+    #     text = text[1:] if text != '' else text
     # if random.random() < 0.3:
     #     text = text[::-1]
 
