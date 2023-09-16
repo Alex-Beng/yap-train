@@ -109,9 +109,9 @@ class Model(nn.Module):
 
     def arr_to_string(self, arr):
         temp = ""
-        last_word = "/"
+        last_word = "|"
         for word in arr:
-            if word != last_word and word != "/":
+            if word != last_word and word != "|":
                 temp += word
             last_word = word
         return temp

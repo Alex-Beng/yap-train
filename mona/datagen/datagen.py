@@ -11,6 +11,7 @@ from mona.text.domains import random_domain_name
 from mona.text.material import random_material_name
 from mona.text.operations import random_operation_name
 from mona.text.weapons import random_weapon_name
+from mona.text.server_leak_names import random_server_leak_name
 
 from mona.config import config
 from mona.datagen.pre_process import pre_process
@@ -31,6 +32,7 @@ random_funcs = [
     random_material_name,
     random_operation_name,
     random_weapon_name,
+    random_server_leak_name,
     # hard code difficult name
     lambda : random.choice(['瑶瑶', '绮良良', 
                             '七七', '落落莓', 
@@ -83,7 +85,7 @@ random_funcs = [
                             "编号Hu-96917的记录",
                             "编号Hu-31122的记录","编号Hu-31122的记录","编号Hu-31122的记录",
                             "编号Hu-31122的记","编号Hu-31122的记","编号Hu-31122的记",
-                            "编号GN-Hu-68513的记录",
+                            "编号GN/Hu-68513的记录",
                             "编号Hu-16180的记录",
                             "编号Hu-73011的记录",
                             "编号Hu-81122的记录","编号Hu-81122的记录","编号Hu-81122的记录",
@@ -114,6 +116,7 @@ random_weights = [
     6,
     3,
     2,
+    6,
     # 0.6, 0.6, 0.6, 0.6, 0.6,
     8, 8, 8, 8, 8, 8
 
