@@ -60,7 +60,6 @@ random_funcs = [
                             '菲尔戈黛', '菲尔戈黛特',
                             '茉洁草',
                             '汝英',
-                            '大久保大',
                             '莎莎妮',
                             
                             '箭簇',
@@ -181,7 +180,7 @@ def generate_image(rand_func=random_text):
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
 
-    x = random.randint(10, 300)
+    x = random.randint(10, 150)
     y = random.randint(-15, 25)
     # 模拟糟糕的阈值带来的粗笔画
     sk_w = random.randint(0, 2)
