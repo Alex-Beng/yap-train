@@ -2,6 +2,7 @@
 from mona.text.characters import characters_name
 from mona.text.operations import operations_names
 from mona.text.domains import domain_names
+from mona.text.server_leak_names import server_leak_names
 
 import json
 import sys
@@ -22,7 +23,7 @@ black_lists = read_or_create_json(path)
 # print(black_lists)
 
 # merge the npc and domain and op name to balck lists
-all_bk = characters_name + operations_names + domain_names
+all_bk = characters_name + operations_names + domain_names + server_leak_names
 for name in all_bk:
     if name not in black_lists:
         black_lists.append(name)
