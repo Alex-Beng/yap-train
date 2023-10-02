@@ -12,6 +12,7 @@ from mona.text.material import random_material_name
 from mona.text.operations import random_operation_name
 from mona.text.weapons import random_weapon_name
 from mona.text.server_leak_names import random_server_leak_name
+from mona.text.book_names import random_book_name
 
 from mona.config import config
 from mona.datagen.pre_process import pre_process
@@ -33,6 +34,7 @@ random_funcs = [
     random_operation_name,
     random_weapon_name,
     random_server_leak_name,
+    random_book_name,
     # hard code difficult name
     lambda : random.choice(['瑶瑶', '绮良良', 
                             '七七', '落落莓', 
@@ -116,13 +118,14 @@ random_weights = [
     3,
     2,
     6,
+    6,
     # 0.6, 0.6, 0.6, 0.6, 0.6,
     8, 8, 8, 8, 8, 8
 
 ]
 
-random_funcs_genshin = random_funcs[:9]
-random_weights_genshin = random_weights[:9]
+random_funcs_genshin = random_funcs[:11]
+random_weights_genshin = random_weights[:11]
 
 
 def rand_color_1():
@@ -186,8 +189,8 @@ def generate_image(rand_func=random_text):
     sk_w = random.randint(0, 2)
     text = rand_func()
     rd_num = random.random()
-    if rd_num < 0.3 and len(text) > 3:
-        text = text[:-1] if text != '' else text
+    # if rd_num < 0.3 and len(text) > 3:
+    #     text = text[:-1] if text != '' else text
     # elif rd_num > 0.7 and len(text) > 3:
     #     text = text[1:] if text != '' else text
     # if random.random() < 0.3:
