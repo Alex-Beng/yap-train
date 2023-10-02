@@ -1,7 +1,7 @@
 config = {
     "height": 32,
     "train_width": 384,
-    "batch_size": 512, # 550 on 4GB gpu memo
+    "batch_size": 128, # 550 on 4GB gpu memo
     "epoch": 1000,
     "print_per": 10,
     "save_per": 400,
@@ -13,7 +13,7 @@ config = {
     "pretrain_name": "model_training.pt",
 
     # Set according to your CPU
-    "dataloader_workers": 3,
+    "dataloader_workers": 1,
     # Generate data online for train/val
     "online_train": True,
     "online_val": True,
