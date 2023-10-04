@@ -73,6 +73,9 @@ domain_names = [
     # 3.6
     "地中的香海",
     "净罪之井",
+
+    # 主线秘境
+    "水之奥秘"
 ]
 
 def random_domain_name():

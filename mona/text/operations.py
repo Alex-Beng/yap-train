@@ -161,6 +161,8 @@ operations_names = [
     "离开沫芒宫",
     "离开歌剧院",
 
+    "退出秘境",
+
     # 尘歌壶
     "更改洞天音乐",
     "邀请",
@@ -233,7 +235,13 @@ operations_names = [
     "返回地面",
     "继续审判",
     "休息" # present in server leak although
-
+    "敲门", # present in server leak although
+    "队伍配置",
+    "观察杂物",
+    "观察瓶子", 
+    "观察实验桌",
+    "观察水池",
+    "观察书架",
 ]
 
 def random_operation_name():
