@@ -50,12 +50,15 @@ F_area = F_area[F_area_contours_bbox[1]:F_area_contours_bbox[1]+F_area_contours_
 triangle_area = cv2.bitwise_and(new_image, new_image, mask=triangle_mask)
 triangle_area = triangle_area[triangle_contours_bbox[1]:triangle_contours_bbox[1]+triangle_contours_bbox[3], triangle_contours_bbox[0]:triangle_contours_bbox[0]+triangle_contours_bbox[2]]
 
-print(F_area.shape, triangle_area.shape)
-
+# print(F_area.shape, triangle_area.shape)
+# print(cv2.imencode('.png', F_area)[1].tobytes())
+# print()
+# print(cv2.imencode('.png', triangle_area)[1].tobytes())
 
 # read a large image
 b_img_path = "./assets/test.png"
 b_img = cv2.imread(b_img_path)
+# print(cv2.imencode('.png', b_img)[1].tobytes())
 
 r, c, _ = b_img.shape
 res_w, res_h = 67, 380
@@ -91,6 +94,13 @@ for _ in range(10):
     # paste F_area and triangle_area to res_img
     res_img[F_y:F_y+33, F_x:F_x+40] = F_area
     res_img[tri_y:tri_y+17, tri_x:tri_x+10] = triangle_area
+
+    F_label_x = F_x + 40//2
+    F_label_y = F_y + 33//2
+    # draw vert
+    cv2.line(res_img, (F_label_x, 0), (F_label_x, res_h), (0, 0, 255), 1)
+    # draw hori
+    cv2.line(res_img, (0, F_label_y), (res_w, F_label_y), (0, 0, 255), 1) 
 
     cv2.imshow("res_img", res_img)
     cv2.waitKey()
