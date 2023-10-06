@@ -1,10 +1,10 @@
 config = {
     "height": 32,
     "train_width": 384,
-    "batch_size": 128, # 550 on 4GB gpu memo
+    "batch_size": 256, # 550 on 4GB gpu memo
     "epoch": 1000,
     "print_per": 10,
-    "save_per": 400,
+    "save_per": 200,
 
     "train_size": 200000,
     "validate_size": 30000,
