@@ -124,8 +124,8 @@ random_weights = [
 
 ]
 
-random_funcs_genshin = random_funcs[:11]
-random_weights_genshin = random_weights[:11]
+random_funcs_genshin = random_funcs[:10]
+random_weights_genshin = random_weights[:10]
 
 
 def rand_color_1():
@@ -179,15 +179,16 @@ def generate_image(rand_func=random_text):
     color2 = rand_color_2()
 
     # 通过控制初始画布的宽度来指定 字符宽度缩放
-    img = Image.new("RGB", (2000+ random.randint(-100, 100), 120), color1)
+    img = Image.new("RGB", (2200 + random.randint(-150, 150), 120), color1)
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
 
-    x = random.randint(10, 150)
-    y = random.randint(-15, 25)
+    x = random.randint(10, 120)
+    y = random.randint(-12, 20)
     # 模拟糟糕的阈值带来的粗笔画
-    sk_w = random.randint(0, 2)
+    sk_w = random.randint(0, 1)
     text = rand_func()
+    # text = "冒险家罗尔德的日志·绝云间·奥藏天池"
     rd_num = random.random()
     # if rd_num < 0.3 and len(text) > 3:
     #     text = text[:-1] if text != '' else text
@@ -339,7 +340,7 @@ def generate_image_sample():
     # draw.fontmode = "1"
 
     # draw.text((20, 5), "虺雷之姿", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
-    draw.text((20, 5), "归风佳酿节节庆热度", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
+    draw.text((20, 5), "冒险家罗尔德的日志·绝云间·奥藏天池", color2, font=ImageFont.truetype("./assets/genshin.ttf", 80))
 
     img_processed = pre_process(img)
     return img, img_processed   
