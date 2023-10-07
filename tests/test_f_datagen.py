@@ -11,9 +11,9 @@ if __name__ == "__main__":
     bg_imgs = [cv2.imread("./assets/test.png")]
 
 
-    dataset = EulaDataset(3, 10, (384, 64), bg_imgs)
-    for i in range(10):
-        img, hm = dataset[0]
+    dataset = EulaDataset(3, 100, (384, 64), bg_imgs)
+    for i in range(100):
+        img, hm, reg, reg_mask = dataset[i]
         
         img *= 255
         img = np.array(img)

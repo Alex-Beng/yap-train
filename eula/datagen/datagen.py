@@ -15,6 +15,11 @@ F_area = cv2.imdecode(F_area_array, cv2.IMREAD_COLOR)
 tri_area_array = np.frombuffer(tri_area_bytes, dtype=np.uint8)
 tri_area = cv2.imdecode(tri_area_array, cv2.IMREAD_COLOR)
 
+F_area_mask = cv2.inRange(F_area, (1, 1, 1), (255, 255, 255))
+tri_area_mask = cv2.inRange(tri_area, (1, 1, 1), (255, 255, 255))
+F_area_mask_inv = cv2.bitwise_not(F_area_mask)
+tri_area_mask_inv = cv2.bitwise_not(tri_area_mask)
+
 background_images = []
 
 
@@ -76,7 +81,7 @@ class EulaDataset(Dataset):
 
         self.input_shape = input_shape
         self.output_shape = (input_shape[0] // 4, input_shape[1] // 4)
-        print(f'output_shape: {self.output_shape}, input_shape: {self.input_shape}')
+        # print(f'output_shape: {self.output_shape}, input_shape: {self.input_shape}')
         self.bg_images = bg_images
 
     def __len__(self):
@@ -97,15 +102,26 @@ class EulaDataset(Dataset):
         # need deepcopy
         res_img = rand_bg[y:y+res_h, x:x+res_w].copy()
 
-        F_x = np.random.randint(0, 3)
+        F_x = np.random.randint(0, 10)
         F_y = np.random.randint(0, res_h-33)
 
         tri_x = np.random.randint(F_x + 40 + 1, res_w-10)
         tri_y = np.random.randint(F_y + 1, F_y + 33 - 17 -1)
 
-        # paste F_area and triangle_area to res_img
-        res_img[F_y:F_y+33, F_x:F_x+40] = F_area
-        res_img[tri_y:tri_y+17, tri_x:tri_x+10] = tri_area
+        # paste F_area and triangle_area to res_img with mask
+        F_roi = res_img[F_y:F_y+33, F_x:F_x+40]
+        tri_roi = res_img[tri_y:tri_y+17, tri_x:tri_x+10]
+
+        # apply mask inv to roi
+        F_roi = cv2.bitwise_and(F_roi, F_roi, mask=F_area_mask_inv)
+        tri_roi = cv2.bitwise_and(tri_roi, tri_roi, mask=tri_area_mask_inv)
+
+        # use add to paste
+        F_roi = cv2.add(F_roi, F_area)
+        tri_roi = cv2.add(tri_roi, tri_area)
+    
+        res_img[F_y:F_y+33, F_x:F_x+40] = F_roi
+        res_img[tri_y:tri_y+17, tri_x:tri_x+10] = tri_roi
 
         F_label_x = F_x + 40//2
         F_label_y = F_y + 33//2
@@ -131,11 +147,12 @@ class EulaDataset(Dataset):
         hm  = np.zeros((self.output_shape[0], self.output_shape[1], self.num_classes), dtype=np.float32)
         reg = np.zeros((self.output_shape[0], self.output_shape[1], 2), dtype=np.float32)
         reg_mask = np.zeros((self.output_shape[0], self.output_shape[1]), dtype=np.float32)
-        print(hm.shape)
+        # print(hm.shape)
         # here only Fkey&tri is 1, bg is 0
         cls_id = 1
 
-        h, w = 20, 20 # hard code it
+        # h, w = 20, 20 # hard code it
+        h, w = 33, 40
         radius = gaussian_radius((h, w), min_overlap=0.7)
         radius = max(0, int(radius))
 
@@ -144,7 +161,7 @@ class EulaDataset(Dataset):
         center[1] = center[1] / self.input_shape[0] * self.output_shape[0]
         center_int = center.astype(np.int32)
         
-        print(center, radius, label, center_int)
+        # print(center, radius, label, center_int)
         hm[:, :, cls_id] = draw_gaussian(hm[:, :, cls_id], center_int, radius)
         reg[center_int[1], center_int[0]] = center - center_int
         reg_mask[center_int[1], center_int[0]] = 1
@@ -152,6 +169,4 @@ class EulaDataset(Dataset):
         # convert img to [0, 1]
         img = transforms.ToTensor()(img)
 
-        return img, hm
-
-    
+        return img, hm, reg, reg_mask

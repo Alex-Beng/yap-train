@@ -4,7 +4,8 @@
 
 [x] mobilenet backbone 
 [x] header
-[ ] loss
-[ ] training framework
+[x] loss
+[x] training framework
+[ ] infer demo
 [ ] to onnx 
-[ ] demo
+

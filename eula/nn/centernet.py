@@ -25,6 +25,22 @@ class CenterNet_MobilenetV3Small(nn.Module):
         self.head.reg_head[-1].bias.data.fill_(-2.19)
     def forward(self, x):
         x = self.backbone(x)
-        cls, offset = self.head(x)
-        return cls, offset
+        hm, offset = self.head(x)
+        return hm, offset
+    
+    def freeze_backbone(self):
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+    def unfreeze_backbone(self):
+        for param in self.backbone.parameters():
+            param.requires_grad = True
 
+    def detect_image(self, image, device):
+        image = image.to(device)
+        image = image.unsqueeze(0)
+        
+        with torch.no_grad():
+            hm, offset = self.forward(image)
+            
+        
+        return hm, offset
