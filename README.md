@@ -2,7 +2,7 @@
 
 
 # Yap-Train
-Just copy from Yas-Train,  see below
+SVTR training from Yas-Train, and CenterNet training
 </div>
 
 
@@ -10,17 +10,37 @@ Just copy from Yas-Train,  see below
 
 基于yas-train二次开发的yap-train。主要的改动有：
 
+
+## 增加了CenterNet的训练支持
+
+
+CenterNet用于目标检测。yas-train仅训练SVTR用于不定长文字识别。
+
+
+对于yap所需的F key 的检测，使用了基于CenterNet进行中心点及offset的回归的方法，
+即抛弃了CenterNet的宽高回归，仅使用中心点及offset回归。并重新设计了输出输出的size，
+输入`[64, 384]`，输出的heatmap`[16, 96, c+2]`。
+
+
+目前使用纯生成数据进行训练。即从背景图中截取`[67, 380]`（yap的真实尺寸）的图像，然后在图像中通过掩码随机生成粘贴F key及其小三角，
+最后resize到`[64, 384]`。并计算训练所需的heatmap及offset。
+
+
+目前还未进onnx部署。
+
+
 ## mona.text，即词库的改动
 
 | 脚本名字 | 内容 |
 | -------- | -------- |
 | [artifact_name.py](./mona/text/artifact_name.py) | 精英怪、调查点、宝箱可能掉落的圣遗物 | 
 | [bwiki_spider.py](./mona/text/artifact_name.py) | 爬bwiki材料图鉴的，**已弃用**|
-| [characters.py](./mona/text/characters.py) | 自给角色、常见（目前是手动添加）NPC、杂项（出现概率差不多的） |
+| [characters.py](./mona/text/characters.py) | 自给角色、常见（目前是手动添加）NPC、~~杂项（出现概率差不多的）~~ |
 | [domains.py](./mona/text/domains.py) | 各种秘境、除了邀约/传说任务秘境 |
 | [material.py](./mona/text/material.py) | 怪物掉落、直接采集、可采集的生物、宝箱掉落（除了武器及圣遗物，即经验书、武器矿、天赋书） |
 | [operations.py](./mona/text/operations.py) | 大世界及尘歌壶里能遇到的互动按键 |
 | [weapons.py](./mona/text/weapons.py) | 1-3星可调查掉落or宝箱掉落的武器 |
+
 
 还有其他的词库，欢迎提交pr。
 
