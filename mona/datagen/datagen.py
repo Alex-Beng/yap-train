@@ -14,15 +14,32 @@ from mona.text.weapons import random_weapon_name
 from mona.text.server_leak_names import random_server_leak_name
 from mona.text.book_names import random_book_name
 
+from mona.text.artifact_name import monster_artifact_name, treasure_artifact_names, check_point_artifact_names
+from mona.text.characters import characters_name
+from mona.text.domains import domain_names
+from mona.text.material import material_names
+from mona.text.operations import operations_names
+from mona.text.weapons import weapons_name
+from mona.text.server_leak_names import server_leak_names
+from mona.text.book_names import book_names
+
+
 from mona.config import config
 from mona.datagen.pre_process import pre_process
 
 # 4k分辨率最大对应84号字，900p分辨率最小对应18号字
 # Yap需要固定字号
-fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(96, 104)]
+fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(80, 104)]
 
-
-
+def load_bg_imgs():
+    path = "../yap/dumps_full_mona2/"
+    # 获取文件夹下所有图片
+    files = os.listdir(path)
+    # 读取图片
+    imgs = []
+    for file in files:
+        imgs.append(cv2.imread(path + file))
+    return imgs
 
 random_funcs = [
     random_monster_artifact_name,
@@ -109,16 +126,27 @@ random_funcs = [
 ]
 # 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
 random_weights = [
-    3,
-    1,
-    1,
-    6,
-    2,
-    6,
-    3,
-    2,
-    6,
-    6,
+    # 1,
+    # 1,
+    # 1,
+    # 2,
+    # 1,
+    # 1,
+    # 2,
+    # 1,
+    # 3,
+    # 1,
+    len(monster_artifact_name),
+    len(treasure_artifact_names),
+    len(check_point_artifact_names),
+    len(characters_name),
+    len(domain_names),
+    len(material_names),
+    len(operations_names),
+    len(weapons_name),
+    len(server_leak_names),
+    len(book_names),
+
     # 0.6, 0.6, 0.6, 0.6, 0.6,
     8, 8, 8, 8, 8, 8
 
@@ -179,7 +207,7 @@ def generate_image(rand_func=random_text):
     color2 = rand_color_2()
 
     # 通过控制初始画布的宽度来指定 字符宽度缩放
-    img = Image.new("RGB", (2200 + random.randint(-150, 150), 120), color1)
+    img = Image.new("RGB", (2000 + random.randint(-80, 80), 120), color1)
     # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
     draw = ImageDraw.Draw(img)
 
@@ -209,9 +237,57 @@ def generate_image(rand_func=random_text):
     # cv2.waitKey()
     # print(img.shape)
     # exit()
-    img = Image.fromarray(img)
+    # img = Image.fromarray(img)
+    # return img, text
 
-    return img, text
+    # pipeline
+    # 扣出文字
+    # 随机选取32x384的背景
+    # 背景叠加一个从左到右渐变黑的图片
+    # 背景叠加文字
+
+    img_inv = cv2.bitwise_not(img)
+    
+    bg_img = random.choice(bg_imgs)
+    bg_r, bg_c, _ = bg_img.shape
+    res_w, res_h = 384, 32
+
+    x = np.random.randint(0, bg_c-res_w)
+    y = np.random.randint(0, bg_r-res_h)
+
+    res_img = bg_img[y:y+res_h, x:x+res_w].copy()
+    # cv2.imshow("bg", res_img)
+    
+    # 随机选取的背景图
+    res_img = cv2.cvtColor(res_img, cv2.COLOR_BGR2GRAY)
+
+    # 叠加渐变图
+    black2white = np.full((32, 384), 0, dtype=np.uint8)
+    white_thre = random.randint(180, 255)
+    for i in range(384):
+        black2white[:, i] = i
+        if i > white_thre:
+            black2white[:, i] = white_thre
+    # 以比例混合
+    cv2.addWeighted(black2white, 0.5, res_img, 0.5, 0, res_img)
+
+    
+    # 文字区域为空白的背景图
+    res_img = cv2.bitwise_and(res_img, res_img, mask=img_inv)
+    # res_img = np.clip(res_img + img, 0, 200)
+    # cv2.imshow("bg2", res_img)
+
+    min_count_val = random.randint(white_thre//2+108, 255)
+
+    rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
+    img = cv2.bitwise_and(rand_img, rand_img, mask=img)
+    # cv2.imshow("mask rd color", img)
+    # print(img.dtype, res_img.dtype)
+
+    res_img = cv2.add(res_img, img)
+
+    res_img = Image.fromarray(res_img)
+    return res_img, text
 
 import pickle
 import cv2
@@ -235,6 +311,7 @@ except:
 
 assert(len(genshin_x_imgs) == len(genshin_y))
 genshin_n = len(genshin_y)
+bg_imgs = load_bg_imgs()
 
 '''
 genshin_x = js_ld('../yap/xx.json')
