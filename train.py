@@ -112,7 +112,11 @@ def train():
     save_per = config["save_per"]
     batch = 0
     start_time = datetime.datetime.now()
+    if config["freeze_backbone"]:
+        net.freeze_backbone()
     for epoch in range(epoch):
+        if config["freeze_backbone"] and epoch == config["unfreeze_backbone_epoch"]:
+            net.unfreeze_backbone()
         for x, label in train_loader:
             # sleep(10)
             optimizer.zero_grad()
@@ -148,6 +152,9 @@ def train():
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if rate == 1:
                     torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
+                if int(rate*10000) >= 9999:
+                    pass
+                    # torch.save(net.state_dict(), f"models/model_acc9998-epoch{epoch}.pt")
 
             batch += 1
 
