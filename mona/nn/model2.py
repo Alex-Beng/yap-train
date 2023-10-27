@@ -129,4 +129,11 @@ class Model2(nn.Module):
                     model_dict[k] = v
                 elif k in model_dict and v.size() != model_dict[k].size():
                     print(f"size dismatch: {k}, {v.size()} -> {model_dict[k].size()}")
+            self.load_state_dict(model_dict)
         print(f"load model from {path}")
+    def freeze_backbone(self):
+        for param in self.cnn.parameters():
+            param.requires_grad = False
+    def unfreeze_backbone(self):
+        for param in self.cnn.parameters():
+            param.requires_grad = True
