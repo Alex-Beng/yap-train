@@ -23,6 +23,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 import argparse
+import pyperclip
 
 
 def js_dp(obj, path):
@@ -67,6 +68,12 @@ with torch.no_grad():
             #  保留两位精度
             print(f"i={i} tput={tput:.2f}", end='\r')
         # path = os.path.join(root_path, genshin_x[i])
+        # if genshin_y[i] == '蕈兽孢子':
+        #     cv2.imshow("c", genshin_x[i])
+        #     print(genshin_x_path[i])
+        #     k = cv2.waitKey(0)
+        #     if k == ord('q'):
+        #         exit()
         path = genshin_x_path[i]
 
         img = genshin_x[i]
@@ -83,6 +90,9 @@ with torch.no_grad():
             k = cv2.waitKey(0)
             if k == ord('q'):
                 exit()
+            else:
+                # 复制path到剪切板
+                pyperclip.copy(f"\n'{path}',")
         if genshin_y[i] == '':
             i += 5
         else:
