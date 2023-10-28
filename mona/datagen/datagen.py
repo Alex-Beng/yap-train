@@ -142,7 +142,7 @@ random_weights = [
     len(characters_name),
     len(domain_names),
     len(material_names),
-    len(operations_names),
+    len(operations_names) * 2,
     len(weapons_name),
     len(server_leak_names),
     len(book_names),
@@ -263,7 +263,7 @@ def generate_image(rand_func=random_text):
 
     # 叠加渐变图
     black2white = np.full((32, 384), 0, dtype=np.uint8)
-    white_thre = random.randint(180, 255)
+    white_thre = random.randint(180, 230)
     for i in range(384):
         black2white[:, i] = i
         if i > white_thre:
@@ -277,7 +277,7 @@ def generate_image(rand_func=random_text):
     # res_img = np.clip(res_img + img, 0, 200)
     # cv2.imshow("bg2", res_img)
 
-    min_count_val = random.randint(white_thre//2+108, 255)
+    min_count_val = random.randint(white_thre//2+118, 255)
 
     rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
     img = cv2.bitwise_and(rand_img, rand_img, mask=img)
