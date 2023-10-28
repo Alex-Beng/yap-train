@@ -81,8 +81,8 @@ def train():
         transforms.RandomApply([
             transforms.RandomChoice([
                 transforms.GaussianBlur(1, 1),
-                transforms.GaussianBlur(3, 3),
-                transforms.GaussianBlur(5, 5),
+                # transforms.GaussianBlur(3, 3),
+                # transforms.GaussianBlur(5, 5),
                 # transforms.GaussianBlur(7,7),
             ])], p=0.5),
 
@@ -152,9 +152,8 @@ def train():
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if rate == 1:
                     torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
-                if int(rate*10000) >= 9999:
-                    pass
-                    # torch.save(net.state_dict(), f"models/model_acc9998-epoch{epoch}.pt")
+                if int(rate*10000) >= 9999 and config["save_acc9999"]:
+                    torch.save(net.state_dict(), f"models/model_acc9999-epoch{epoch}.pt")
 
             batch += 1
 

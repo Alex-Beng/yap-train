@@ -23,6 +23,9 @@ config = {
     # 生成混合数据时标注数据比例
     "data_genshin_ratio": 0.15,
 
+    # save acc 9999
+    "save_acc9999": True,
+
     # backbone freeze
     # 初始训练时冻结backbone，训练一段时间后解冻
     "freeze_backbone": False,
