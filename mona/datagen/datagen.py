@@ -142,13 +142,13 @@ random_weights = [
     len(characters_name),
     len(domain_names),
     len(material_names),
-    len(operations_names) * 2,
+    len(operations_names) * 4,
     len(weapons_name),
     len(server_leak_names),
-    len(book_names),
+    len(book_names) * 2,
 
     # 0.6, 0.6, 0.6, 0.6, 0.6,
-    8, 8, 8, 8, 8, 8
+    80, 80, 80, 80, 80, 80
 
 ]
 
@@ -218,6 +218,9 @@ def generate_image(rand_func=random_text):
     text = rand_func()
     # text = "冒险家罗尔德的日志·绝云间·奥藏天池"
     rd_num = random.random()
+    if rd_num < 0.05:
+        text = "冒险家罗尔德的日志·绝云间·奥藏天池"
+    
     # if rd_num < 0.3 and len(text) > 3:
     #     text = text[:-1] if text != '' else text
     # elif rd_num > 0.7 and len(text) > 3:
@@ -227,11 +230,28 @@ def generate_image(rand_func=random_text):
 
     draw.text((x, y), text, color2, font=random.choice(fonts), stroke_width=sk_w)
 
+    rd_num = random.random()
+    if rd_num < 0:
+        img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.resize(img, (384, 32))
+        img = Image.fromarray(img)
+        return img, text
+
     # 使用大津法阈值
     img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.resize(img, (384, 32))
     cv2.threshold(img, 0, 255, cv2.THRESH_OTSU, img)
+
+    # 计算文字区域的最右边的白色像素所在的col
+    # 用于后续的叠加
+    img_right_white_col = 0
+    for col in range(383, 0, -1):
+        if img[:, col].max() == 255:
+            img_right_white_col = col
+            break
+
     img = cv2.bitwise_not(img)
     # cv2.imshow('img', img)
     # cv2.waitKey()
@@ -265,8 +285,9 @@ def generate_image(rand_func=random_text):
     black2white = np.full((32, 384), 0, dtype=np.uint8)
     white_thre = random.randint(180, 230)
     for i in range(384):
-        black2white[:, i] = i
-        if i > white_thre:
+        pixel = i * 0.5
+        black2white[:, i] = pixel
+        if pixel > white_thre:
             black2white[:, i] = white_thre
     # 以比例混合
     cv2.addWeighted(black2white, 0.5, res_img, 0.5, 0, res_img)
@@ -277,7 +298,7 @@ def generate_image(rand_func=random_text):
     # res_img = np.clip(res_img + img, 0, 200)
     # cv2.imshow("bg2", res_img)
 
-    min_count_val = random.randint(white_thre//2+118, 255)
+    min_count_val = random.randint(white_thre//2+100, 255)
 
     rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
     img = cv2.bitwise_and(rand_img, rand_img, mask=img)
