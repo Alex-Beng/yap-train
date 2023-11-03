@@ -6,6 +6,7 @@ from .operations import operations_names
 from .weapons import weapons_name
 from .server_leak_names import server_leak_names
 from .book_names import book_names
+from .common_Chinese import common_Chinese
 
 lexicon = set({})
 ALL_NAMES = monster_artifact_name \
@@ -17,7 +18,8 @@ ALL_NAMES = monster_artifact_name \
     + operations_names \
     + weapons_name \
     + server_leak_names \
-    + book_names
+    + book_names \
+    + common_Chinese
 for name in ALL_NAMES:
     for char in name:
         lexicon.add(char)

@@ -13,6 +13,7 @@ from mona.text.operations import random_operation_name
 from mona.text.weapons import random_weapon_name
 from mona.text.server_leak_names import random_server_leak_name
 from mona.text.book_names import random_book_name
+from mona.text.common_Chinese import random_chinese
 
 from mona.text.artifact_name import monster_artifact_name, treasure_artifact_names, check_point_artifact_names
 from mona.text.characters import characters_name
@@ -52,6 +53,34 @@ random_funcs = [
     random_weapon_name,
     random_server_leak_name,
     random_book_name,
+]
+random_weights = [
+    len(monster_artifact_name),
+    len(treasure_artifact_names),
+    len(check_point_artifact_names),
+    len(characters_name),
+    len(domain_names),
+    len(material_names),
+    len(operations_names) * 4,
+    len(weapons_name),
+    len(server_leak_names),
+    len(book_names) * 2,
+]
+random_funcs_genshin = random_funcs.copy()
+random_weights_genshin = random_weights.copy()
+
+
+random_funcs += [
+    # random chinese
+    lambda : random_chinese(1),
+    lambda : random_chinese(2),
+    lambda : random_chinese(3),
+    lambda : random_chinese(4),
+    lambda : random_chinese(5),
+    lambda : random_chinese(6),
+    lambda : random_chinese(7),
+    lambda : random_chinese(8),
+
     # hard code difficult name
     lambda : random.choice(['瑶瑶', '绮良良', 
                             '七七', '落落莓', 
@@ -113,47 +142,12 @@ random_funcs = [
                             '流放者头冠',
                             '卡斯帕',
                             ]),
-    # single word
-    lambda : random.randint(0, 5) * (' ') + random.choice(lexicon),
-    # twins word
-    lambda : random.randint(0, 4) * (' ') + random.choice(lexicon) * 2,
-    # 三字
-    lambda : random.randint(0, 3) * (' ') + random.choice(lexicon) * 3,
-    # 四字
-    lambda : random.randint(0, 2) * (' ') + random.choice(lexicon) * 4,
-    # dual word
-    lambda : random.randint(0, 4) * (' ') + random.choice(lexicon) + random.choice(lexicon),
 ]
-# 加大random_artifact_count的权重，因为连续数字识别是CRNN模型的难点，这对于副词条识别也有帮助。
-random_weights = [
-    # 1,
-    # 1,
-    # 1,
-    # 2,
-    # 1,
-    # 1,
-    # 2,
-    # 1,
-    # 3,
-    # 1,
-    len(monster_artifact_name),
-    len(treasure_artifact_names),
-    len(check_point_artifact_names),
-    len(characters_name),
-    len(domain_names),
-    len(material_names),
-    len(operations_names) * 4,
-    len(weapons_name),
-    len(server_leak_names),
-    len(book_names) * 2,
+# 
 
-    # 0.6, 0.6, 0.6, 0.6, 0.6,
-    80, 80, 80, 80, 80, 80
+random_weights += [100] * 8
+random_weights += [1]
 
-]
-
-random_funcs_genshin = random_funcs[:10]
-random_weights_genshin = random_weights[:10]
 
 
 def rand_color_1():
