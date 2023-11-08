@@ -452,7 +452,7 @@ common_punctuation = [
     "》",
     "「",
     "」",
-] * 1000 # just assume that p : c = 1 : 3500
+] * 500 # just assume that p : c = 1 : 3500
 
 def random_chinese(length=1):
     return ''.join(random.sample(common_Chinese+common_punctuation, length))
