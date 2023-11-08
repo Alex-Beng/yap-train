@@ -18,12 +18,18 @@ ALL_NAMES = monster_artifact_name \
     + operations_names \
     + weapons_name \
     + server_leak_names \
-    + book_names \
+    + book_names 
+
+ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES.copy()
+ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES_WITH_COMMON_CHINESE \
     + common_Chinese
-for name in ALL_NAMES:
+namelen2num = {}
+for name in ALL_NAMES_WITH_COMMON_CHINESE:
+    namelen2num[len(name)] = namelen2num.get(len(name), 0) + 1
     for char in name:
         lexicon.add(char)
-
+lens = sorted(list(namelen2num.keys()))
+print(f"len 2 num: {lens}\n{[namelen2num[l] for l in lens]}")
 
 lexicon = sorted(list(lexicon))
 
