@@ -133,7 +133,7 @@ class Model2(nn.Module):
                     # using word map to fill the known part of the linear2
                     if k != "linear2.weight" and k != "linear2.bias":
                         print(f"fail to load {k}")
-                    old_idx2word = json.load(open(old_idx2word_path, "r"))
+                    old_idx2word = json.load(open(old_idx2word_path, "r", encoding="utf-8"))
                     # make the key from str -> num
                     old_idx2word = {int(k): v for k, v in old_idx2word.items()}
                     old_word2idx = {}
