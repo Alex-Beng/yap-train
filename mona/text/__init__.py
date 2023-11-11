@@ -24,7 +24,7 @@ ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES.copy()
 ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES_WITH_COMMON_CHINESE \
     + common_Chinese
 namelen2num = {}
-for name in ALL_NAMES_WITH_COMMON_CHINESE:
+for name in ALL_NAMES:
     namelen2num[len(name)] = namelen2num.get(len(name), 0) + 1
     for char in name:
         lexicon.add(char)
