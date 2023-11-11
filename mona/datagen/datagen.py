@@ -30,7 +30,7 @@ from mona.datagen.pre_process import pre_process
 
 # 4k分辨率最大对应84号字，900p分辨率最小对应18号字
 # Yap需要固定字号
-fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(80, 104)]
+fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(85, 104)]
 
 def load_bg_imgs():
     path = "../yap/dumps_full_mona2/"
@@ -56,66 +56,45 @@ random_funcs = [
 
     # hard code difficult name and new word
     lambda : random.choice([
-        
+        "播放中","安装键帽","安装键帽","安装键帽","安装键帽","安装键帽",
+        "海贼的日志",
+        "雨","晴","流转",
+        "异界余影","异界余影","异界余影","异界余影","异界余影",
+        '塔米米',
+        '字迹歪歪扭扭的记事',
+        '观察蒲公英',
+        '犬又二分之一·一','犬又二分之一·三',
+        '特别枫达专卖机',
+        '思思','璐璐',
+        '小麦', '小姜','小蒙',
+        '混沌容器','混沌装置', '混沌机关', '沉重号角', 
+        '混沌模块','混沌回路', '混沌枢纽', '黑铜号角', 
+        '混沌锚栓','混沌炉心', '混沌真眼', '黑晶号角', 
+
+        "老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表",
+        "役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表",
+        "役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻",
+            
+
+        "湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰",
+        "初露之源","初露之源","初露之源","初露之源","初露之源","初露之源",
+        "无光丝线","无光丝线","无光丝线","无光丝线","无光丝线","无光丝线",
+        "无光涡眼","无光涡眼","无光涡眼","无光涡眼","无光涡眼","无光涡眼",
+        "无光质块","无光质块","无光质块","无光质块","无光质块","无光质块",
         '瑶瑶', '绮良良', 
         '七七', '落落莓', 
-        '墩墩桃', '调查',
+        '墩墩桃', '调查', '薇塔',
         '泡泡桔', '嘟嘟莲',
         '甜甜花', '钩钩果',
         '松果', '松茸',
-        '棱镜', '棱晶',
         '孢子', '种子',
         '班尼特', '琳妮特',
-        "驾驶浪船", '浪船',
-        '云堇',
-        '凝光',
-        "太山府",
-        '玛格丽特', '玛格丽',
-        '齐格芙丽雅',
-        # '「」', '」', '「',
-        '「清心」的种子', '清心',
-        '「金鱼草」的种子', 
-        '「蘑菇」的孢子', 
-        '「绝云椒椒」的种子',
-        "「塞西莉亚花」的种子",
-        # "大英雄的经",
-        '阿汉格尔','孙宇',
-        '菲尔戈黛', '菲尔戈黛特',
-        '茉洁草',
-        '汝英',
-        '莎莎妮',
         
-        '箭簇',
-        # '浊水的一','浊水的一','浊水的一',
-        '浊水的一掬', '浊水的一滴','浊水的一掬', '浊水的一滴','浊水的一掬', '浊水的一滴',
-        "地脉的旧枝", "地脉的枯叶", "地脉的新芽",
-        "旧枝", "枯叶", "新芽", "地脉的",
         "开启试炼", "开启挑战",
-        '水晶蝶', '水晶块', '冰晶蝶', "晶蝶",
-        '兽肉', '鱼肉', 
-        "蓝角蜥", "红角蜥", "绿角蜥", '角蜥',
-        '隐兽指爪', '隐兽利爪','隐兽指爪', '隐兽利爪', '隐兽',
-        '荒性能量块', '芒性能量块',
+        '水晶蝶', '水晶块', '冰晶蝶', 
+        '隐兽指爪', '隐兽利爪','隐兽指爪', '隐兽利爪', 
         "落日鳅鳅", "金鳅鳅", "晴天鳅鳅", '鳅鳅',
-        "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", '鳗鳗',
-        '胡桃', '阅读',
-        '黑晶号角', '黑铜号角', '号角', '黑晶号', '黑铜号',
-        '召唤草种子', '召唤雷种子',
-        "晦暗刻像", "幽邃刻像", "夤夜刻像",'刻像',
-        '精锻用杂矿', '精锻用良矿', '精锻用魔矿', '精锻用', '魔矿', '良矿', '杂矿',
-        "编号Hu-42318的记录",
-        "编号Hu-96917的记录",
-        "编号Hu-31122的记录","编号Hu-31122的记录","编号Hu-31122的记录",
-        "编号Hu-31122的记","编号Hu-31122的记","编号Hu-31122的记",
-        "编号GN/Hu-68513的记录",
-        "编号Hu-16180的记录",
-        "编号Hu-73011的记录",
-        "编号Hu-81122的记录","编号Hu-81122的记录","编号Hu-81122的记录",
-        "编号Hu-21030的记录",
-        "编号Hu-57104的记录",
-        '？？？', 
-        '流放者头冠',
-        '卡斯帕',
+        "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", 
         ]),
 ]
 random_weights = [
@@ -127,16 +106,22 @@ random_weights = [
     len(material_names) * 2,
     len(operations_names),
     len(weapons_name),
-    len(server_leak_names) * 2,
+    len(server_leak_names),
     len(book_names),
 
-    100,
+    400,
 ]
 random_funcs_genshin = random_funcs.copy()
 random_weights_genshin = random_weights.copy()
 
+# norm the weights and print it
+sum_weights = sum(random_weights)
+random_weights = [w / sum_weights for w in random_weights]
 
-
+# print([w / sum_weights for w in random_weights])
+for w in random_weights:
+    print(f"{w*100:.4f}", end=" ")
+print()
 
 random_funcs += [
     # random chinese
@@ -215,6 +200,7 @@ def generate_image(rand_func=random_text):
     sk_w = random.randint(0, 1)
     text = rand_func()
     # text = "冒险家罗尔德的日志·绝云间·奥藏天池"
+    # text = "?？?？"
     rd_num = random.random()
     # if rd_num < 0.05:
     #     text = "冒险家罗尔德的日志·绝云间·奥藏天池"
@@ -282,28 +268,32 @@ def generate_image(rand_func=random_text):
     # 叠加渐变图
     black2white = np.full((32, 384), 0, dtype=np.uint8)
     white_thre = random.randint(180, 230)
+    # white_thre = 180
     for i in range(384):
         pixel = i * 0.5
         black2white[:, i] = pixel
         if pixel > white_thre:
             black2white[:, i] = white_thre
     # 以比例混合
-    cv2.addWeighted(black2white, 0.5, res_img, 0.5, 0, res_img)
+    cv2.addWeighted(black2white, 0.2, res_img, 0.8, 0, res_img)
 
-    
-    # 文字区域为空白的背景图
-    res_img = cv2.bitwise_and(res_img, res_img, mask=img_inv)
-    # res_img = np.clip(res_img + img, 0, 200)
-    # cv2.imshow("bg2", res_img)
 
     min_count_val = random.randint(white_thre//2+100, 255)
+    # min_count_val = white_thre//2+100
 
     rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
+    # img = cv2.addWeighted(rand_img, 0.2, img, 0.8, 0, img)
+    # 将img中的白色像素点的值变为rand_img中的值，使用opencv的bitwise_and
     img = cv2.bitwise_and(rand_img, rand_img, mask=img)
-    # cv2.imshow("mask rd color", img)
-    # print(img.dtype, res_img.dtype)
 
-    res_img = cv2.add(res_img, img)
+    # 随机权重叠加字和背景
+    wdg = random.uniform(0.4, 0.9)
+    # wdg = 0.4
+    res_img = cv2.addWeighted(res_img, wdg, img, 1-wdg, 0, res_img)
+
+    # res_img 随机乘以一个系数
+    res_img = res_img * random.uniform(0.7, 1.5)
+    res_img = res_img.astype(np.uint8)
 
     res_img = Image.fromarray(res_img)
     return res_img, text
