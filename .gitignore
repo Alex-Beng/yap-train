@@ -7,3 +7,11 @@ __pycache__/
 data_all/
 models[_a-z]*
 samples2/
+.vscode
+*.bmp
+*.png
+*.log
+*.log[0-9]*
+*.out
+*.text
+*.txt
