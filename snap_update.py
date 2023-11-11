@@ -106,6 +106,7 @@ black_list = set([
 '社奉行武士A',
 '黄麻子众人1',
 '镀金旅团C',
+'「胆怯」的守卫4',
 ])
 
 npc_url = "https://raw.githubusercontent.com/DGP-Studio/Snap.Metadata/main/CheatTable/CHS/Npc.csv"
