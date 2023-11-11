@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 
 # from mona.text.stat import random_stat, random_value
-from mona.datagen.datagen import generate_image, generate_image_sample, generate_mix_image
+from mona.datagen.datagen import generate_image, generate_image_sample, generate_mix_image, random_text_genshin_distribute
 from train import train
 from mona.config import config
 
@@ -71,8 +71,9 @@ if __name__ == "__main__":
             os.mkdir(folder)
 
         for i in range(100):
-            im, text = generate_mix_image()
-            text.replace("/", "_")
+            im, text = generate_mix_image(random_text_genshin_distribute, 0)
+            text = text.replace("/", "_")
+            text = text.replace("?", "_")
             im.save(f"samples/{i}_{text}.png")
             # img_processed.save((f"samples/{i}_p.png"))
     elif sys.argv[1] == 'sample2':
