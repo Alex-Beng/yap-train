@@ -56,43 +56,43 @@ random_funcs = [
 
     # hard code difficult name and new word
     lambda : random.choice([
-        "播放中","安装键帽","安装键帽","安装键帽","安装键帽","安装键帽",
-        "海贼的日志",
-        "雨","晴","流转",
-        "异界余影","异界余影","异界余影","异界余影","异界余影",
-        '塔米米',
-        '字迹歪歪扭扭的记事',
-        '观察蒲公英',
-        '犬又二分之一·一','犬又二分之一·三',
+        '进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（',
+        # "秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请",
+        "红莲蛾",
+        # "碎星铁矿", "观察手鞠",
+        "自动","自动","自动","自动","自动","自动",
+        "播放中",
+        # "安装键帽","安装键帽","安装键帽","安装键帽","安装键帽",
+        # "海贼的日志",
+        # "雨","晴","流转",
+        "异界余影",
+        # '塔米米',
+        # '字迹歪歪扭扭的记事',
+        # '观察蒲公英',
         '特别枫达专卖机',
         '思思','璐璐',
         '小麦', '小姜','小蒙',
-        '混沌容器','混沌装置', '混沌机关', '沉重号角', 
-        '混沌模块','混沌回路', '混沌枢纽', '黑铜号角', 
-        '混沌锚栓','混沌炉心', '混沌真眼', '黑晶号角', 
+        # '混沌容器','混沌装置', '混沌机关', '沉重号角', 
+        # '混沌模块','混沌回路', '混沌枢纽', '黑铜号角', 
+        # '混沌锚栓','混沌炉心', '混沌真眼', '黑晶号角', 
 
-        "老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表","老旧的役人怀表",
-        "役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表","役人的制式怀表",
-        "役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻","役人的时时刻刻",
+        "老旧的役人怀表",
+        "役人的制式怀表",
+        "役人的时时刻刻",
             
+        "湖光铃兰",
+        "初露之源",
+        "无光丝线",
+        "无光涡眼",
+        "无光质块",
 
-        "湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰","湖光铃兰",
-        "初露之源","初露之源","初露之源","初露之源","初露之源","初露之源",
-        "无光丝线","无光丝线","无光丝线","无光丝线","无光丝线","无光丝线",
-        "无光涡眼","无光涡眼","无光涡眼","无光涡眼","无光涡眼","无光涡眼",
-        "无光质块","无光质块","无光质块","无光质块","无光质块","无光质块",
-        '瑶瑶', '绮良良', 
-        '七七', '落落莓', 
         '墩墩桃', '调查', '薇塔',
         '泡泡桔', '嘟嘟莲',
         '甜甜花', '钩钩果',
         '松果', '松茸',
-        '孢子', '种子',
         '班尼特', '琳妮特',
         
-        "开启试炼", "开启挑战",
         '水晶蝶', '水晶块', '冰晶蝶', 
-        '隐兽指爪', '隐兽利爪','隐兽指爪', '隐兽利爪', 
         "落日鳅鳅", "金鳅鳅", "晴天鳅鳅", '鳅鳅',
         "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", 
         ]),
@@ -287,17 +287,20 @@ def generate_image(rand_func=random_text):
     img = cv2.bitwise_and(rand_img, rand_img, mask=img)
 
     # 随机权重叠加字和背景
-    wdg = random.uniform(0.4, 0.9)
+    wdg = random.uniform(0.4, 0.7)
     # wdg = 0.4
     res_img = cv2.addWeighted(res_img, wdg, img, 1-wdg, 0, res_img)
 
     # res_img 随机乘以一个系数
-    res_img = res_img * random.uniform(0.7, 1.5)
+    max_pixel = res_img.max()
+    max_ratio = 255 / max_pixel
+    res_img = res_img * random.uniform(0.7, max_ratio)
     res_img = res_img.astype(np.uint8)
 
     res_img = Image.fromarray(res_img)
     return res_img, text
 
+import lzma
 import pickle
 import cv2
 import json
@@ -311,11 +314,11 @@ def js_ld(path):
 
 # 使用pickle读入预先存放的arrays，省去随机读取的时间
 try:
-    genshin_x_imgs = pickle.load(open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
-    genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
+    genshin_x_imgs = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
+    genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
 except:
-    genshin_x_imgs = pickle.load(open('D:/genshin_x_imgs.pkl', 'rb'))
-    genshin_y = pickle.load(open('D:/genshin_y.pkl', 'rb'))
+    genshin_x_imgs = pickle.load(lzma.open('D:/genshin_x_imgs.pkl', 'rb'))
+    genshin_y = pickle.load(lzma.open('D:/genshin_y.pkl', 'rb'))
 
 
 assert(len(genshin_x_imgs) == len(genshin_y))
