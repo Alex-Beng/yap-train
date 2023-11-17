@@ -12,6 +12,7 @@ from mona.nn.model2 import Model2
 
 from mona.nn import predict as predict_net
 
+import lzma
 import pickle
 import cv2
 import json
@@ -33,9 +34,9 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 
-genshin_x = pickle.load(open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
-genshin_x_path = pickle.load(open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
-genshin_y = pickle.load(open('/media/alex/Data/genshin_y.pkl', 'rb'))
+genshin_x = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
+genshin_x_path = pickle.load(lzma.open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
+genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
 
 # genshin_x = genshin_x[::-1]
 # genshin_x_path = genshin_x_path[::-1]
@@ -52,7 +53,7 @@ args = parser.parse_args()
 model_file_path = args.model_file
 
 device = "cuda"
-device = "cpu"
+# device = "cpu"
 net = Model2(len(index_to_word), 1).to(device)
 net.load_state_dict(torch.load(
         model_file_path, map_location=torch.device(device)))
@@ -61,9 +62,9 @@ with torch.no_grad():
     begin_time = time.time()
     i = 0
     while i < genshin_n:
-        if i%100 == 0 and i != 0:
+        if i%10 == 0 and i != 0:
             end_time = time.time()
-            tput = 100/(end_time-begin_time)
+            tput = 10/(end_time-begin_time)
             begin_time = end_time
             #  保留两位精度
             print(f"i={i} tput={tput:.2f}", end='\r')
@@ -94,7 +95,7 @@ with torch.no_grad():
                 # 复制path到剪切板
                 pyperclip.copy(f"\n'{path}',")
         if genshin_y[i] == '':
-            i += 5
+            i += 2
         else:
             i += 2
 

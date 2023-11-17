@@ -1,5 +1,8 @@
+import time
+
 from mona.text import lexicon, ALL_NAMES
 
+import lzma
 import pickle
 import os
 import cv2
@@ -12,6 +15,12 @@ def js_dp(obj, path):
 
 def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
+
+ALL_NAMES = ALL_NAMES + [
+    # for click usage
+    "进入世界申请（",
+    "秘境挑战组队邀请",
+]
 
 ALL_NAMES = set(ALL_NAMES)
 
@@ -43,9 +52,12 @@ genshin_n = len(genshin_x)
 genshin_y_new = []
 genshin_x_path = [] # for clean up
 genshin_x_imgs = []
+beg_time = time.time()
 for i in range(genshin_n):
-    if i%1000 == 0 and i != 0:
-        print(f'\r{i}/{genshin_n}', end="")
+    if i%100 == 0 and i != 0:
+        eta_time = (time.time() - beg_time) / 100 * (genshin_n - i)
+        print(f'\r{i}/{genshin_n}, eta: {eta_time:.4}s', end="")
+        beg_time = time.time()
     path = os.path.join(root_path, genshin_x[i])
     with Image.open(path) as img:
         img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -79,10 +91,10 @@ for i in range(genshin_n):
         if text == '':
             img0 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=0)
             img1 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_CONSTANT, value=255)
-            img2 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_DEFAULT, value=0)
-            img3 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REFLECT, value=0)
-            img4 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REPLICATE, value=0)
-            for j in range(5):
+            # img2 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_DEFAULT, value=0)
+            # img3 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REFLECT, value=0)
+            # img4 = cv2.copyMakeBorder(img, 0,0,0,384-new_c, cv2.BORDER_REPLICATE, value=0)
+            for j in range(2):
                 genshin_x_path.append(genshin_x[i])
                 genshin_y_new.append(text)
                 genshin_x_imgs.append(eval(f'img{j}'))
@@ -111,12 +123,14 @@ for i in range(genshin_n):
 
 
 # 直接pickle避免多次随机读取
+beg_time = time.time()
 try:
-    pickle.dump(genshin_x_path, open('/media/alex/Data/genshin_x_path.pkl', 'wb'))
-    pickle.dump(genshin_x_imgs, open('/media/alex/Data/genshin_x_imgs.pkl', 'wb'))
-    pickle.dump(genshin_y_new,  open('/media/alex/Data/genshin_y.pkl', 'wb'))
+    pickle.dump(genshin_x_path, lzma.open('/media/alex/Data/genshin_x_path.pkl', 'wb'))
+    pickle.dump(genshin_x_imgs, lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'wb'))
+    pickle.dump(genshin_y_new,  lzma.open('/media/alex/Data/genshin_y.pkl', 'wb'))
 except:
-    pickle.dump(genshin_x_path, open('D:/genshin_x_path.pkl', 'wb'))
-    pickle.dump(genshin_x_imgs, open('D:/genshin_x_imgs.pkl', 'wb'))
-    pickle.dump(genshin_y_new,  open('D:/genshin_y.pkl', 'wb'))
+    pickle.dump(genshin_x_path, lzma.open('D:/genshin_x_path.pkl', 'wb'))
+    pickle.dump(genshin_x_imgs, lzma.open('D:/genshin_x_imgs.pkl', 'wb'))
+    pickle.dump(genshin_y_new,  lzma.open('D:/genshin_y.pkl', 'wb'))
+print(f'pickle dump time: {time.time() - beg_time:.4}s')
 # pickle.dump(genshin_y, open('./genshin_y.pkl', 'wb'))
