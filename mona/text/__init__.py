@@ -7,6 +7,7 @@ from .weapons import weapons_name
 from .server_leak_names import server_leak_names
 from .book_names import book_names
 from .common_Chinese import common_Chinese
+from .field_operations import field_operations_names
 
 lexicon = set({})
 ALL_NAMES = monster_artifact_name \
@@ -18,7 +19,8 @@ ALL_NAMES = monster_artifact_name \
     + operations_names \
     + weapons_name \
     + server_leak_names \
-    + book_names 
+    + book_names \
+    + field_operations_names
 
 ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES.copy()
 ALL_NAMES_WITH_COMMON_CHINESE = ALL_NAMES_WITH_COMMON_CHINESE \
