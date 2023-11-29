@@ -33,10 +33,15 @@ def js_dp(obj, path):
 def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
+try:
+    genshin_x = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
+    genshin_x_path = pickle.load(lzma.open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
+    genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
+except:
+    genshin_x = pickle.load(lzma.open('D:/genshin_x_imgs.pkl', 'rb'))
+    genshin_x_path = pickle.load(lzma.open('D:/genshin_x_path.pkl', 'rb'))
+    genshin_y = pickle.load(lzma.open('D:/genshin_y.pkl', 'rb'))
 
-genshin_x = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
-genshin_x_path = pickle.load(lzma.open('/media/alex/Data/genshin_x_path.pkl', 'rb'))
-genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
 
 # genshin_x = genshin_x[::-1]
 # genshin_x_path = genshin_x_path[::-1]
