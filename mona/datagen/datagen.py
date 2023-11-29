@@ -14,6 +14,8 @@ from mona.text.weapons import random_weapon_name
 from mona.text.server_leak_names import random_server_leak_name
 from mona.text.book_names import random_book_name
 from mona.text.common_Chinese import random_chinese
+from mona.text.field_operations import random_field_operation_name
+from mona.text.ui_names import random_ui_name
 
 from mona.text.artifact_name import monster_artifact_name, treasure_artifact_names, check_point_artifact_names
 from mona.text.characters import characters_name
@@ -23,6 +25,8 @@ from mona.text.operations import operations_names
 from mona.text.weapons import weapons_name
 from mona.text.server_leak_names import server_leak_names
 from mona.text.book_names import book_names
+from mona.text.field_operations import field_operations_names
+from mona.text.ui_names import ui_names, ui_names_raw_mix, ui_names_pickup_like, ui_names_pure
 
 
 from mona.config import config
@@ -53,23 +57,34 @@ random_funcs = [
     random_weapon_name,
     random_server_leak_name,
     random_book_name,
+    random_field_operation_name,
 
     # hard code difficult name and new word
     lambda : random.choice([
-        '进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（','进入世界申请（',
-        # "秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请","秘境挑战组队邀请",
+        "",
+        "阿蕾奇诺",
+        "突入邪恶巢穴","突入邪恶巢穴","突入邪恶巢穴",
+        # "勇闯水妖王国","勇闯水妖王国","勇闯水妖王国",
+        # "奏响回响海螺","奏响回响海螺","奏响回响海螺",
+        # "主板调试","主板调试","主板调试",
+        "加入奶油",
+        "加入牛奶",
+        "阿嘟",
+
+        '进入世界申请（',
+        "秘境挑战组队邀请",
         "红莲蛾",
         # "碎星铁矿", "观察手鞠",
-        "自动","自动","自动","自动","自动","自动",
+        "自动",
         "播放中",
         # "安装键帽","安装键帽","安装键帽","安装键帽","安装键帽",
         # "海贼的日志",
         # "雨","晴","流转",
-        "异界余影",
+        # "异界余影",
         # '塔米米',
         # '字迹歪歪扭扭的记事',
         # '观察蒲公英',
-        '特别枫达专卖机',
+        # '特别枫达专卖机',
         '思思','璐璐',
         '小麦', '小姜','小蒙',
         # '混沌容器','混沌装置', '混沌机关', '沉重号角', 
@@ -86,15 +101,15 @@ random_funcs = [
         "无光涡眼",
         "无光质块",
 
-        '墩墩桃', '调查', '薇塔',
-        '泡泡桔', '嘟嘟莲',
-        '甜甜花', '钩钩果',
-        '松果', '松茸',
-        '班尼特', '琳妮特',
+        # '墩墩桃', '调查', '薇塔',
+        # '泡泡桔', '嘟嘟莲',
+        # '甜甜花', '钩钩果',
+        # '松果', '松茸',
+        # '班尼特', '琳妮特',
         
         '水晶蝶', '水晶块', '冰晶蝶', 
-        "落日鳅鳅", "金鳅鳅", "晴天鳅鳅", '鳅鳅',
-        "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", 
+        # "落日鳅鳅", "金鳅鳅", "晴天鳅鳅",
+        # "藤纹陆鳗鳗", "深海鳗鳗", "赤鳍陆鳗鳗", "流沙鳗鳗", 
         ]),
 ]
 random_weights = [
@@ -108,6 +123,7 @@ random_weights = [
     len(weapons_name),
     len(server_leak_names),
     len(book_names),
+    len(field_operations_names),
 
     400,
 ]
@@ -185,7 +201,7 @@ def random_text_genshin_distribute():
 
 
 # 反射！反向控制！传入对象！JVAV！牛的不行！
-def generate_image(rand_func=random_text):
+def generate_pure_bg_image(rand_func=random_text):
     color1 = rand_color_1()
     color2 = rand_color_2()
 
@@ -357,7 +373,7 @@ for i in range(genshin_n):
         genshin_x_imgs.append(img)
 '''
 
-def generate_mix_image(rand_func=random_text, ratio=0.5):
+def generate_pickup_image(rand_func=random_text, ratio=0.5):
 
     # 一半真实数据，一半生成数据
     # 真实数据仅用空白数据
@@ -408,8 +424,121 @@ def generate_mix_image(rand_func=random_text, ratio=0.5):
         #     return img, text
         
     else:
-        return generate_image(rand_func)
+        return generate_pure_bg_image(rand_func)
+
+
+# 纯色比例 -> image & text
+def generate_ui_image():
+    color1 = rand_color_1()
+    color2 = rand_color_2()
+
+    # 通过控制初始画布的宽度来指定 字符宽度缩放
+    img = Image.new("RGB", (2000 + random.randint(-80, 80), 120), color1)
+    # img = Image.new("RGB", (config["train_width"], config["height"]), color1)
+    draw = ImageDraw.Draw(img)
+
+    x = random.randint(10, 120)
+    y = random.randint(-12, 20)
+    # 模拟糟糕的阈值带来的粗笔画
+    sk_w = random.randint(0, 1)
+    text = random_ui_name()
     
+    draw.text((x, y), text, color2, font=random.choice(fonts), stroke_width=sk_w)
+
+    if text in ui_names_pure:
+        img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.resize(img, (384, 32))
+        # random 255-pixel
+        if random.random() < 0.5:
+            img = cv2.bitwise_not(img)
+        img = Image.fromarray(img)
+        return img, text
+
+    # 使用大津法阈值
+    img = cv2.cvtColor(np.asarray(img),cv2.COLOR_RGB2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.resize(img, (384, 32))
+    cv2.threshold(img, 0, 255, cv2.THRESH_OTSU, img)
+
+    img = cv2.bitwise_not(img)
+
+    # pipeline
+    # 扣出文字
+    # 随机选取32x384的背景
+    # 背景叠加一个从左到右渐变黑的图片
+    # 背景叠加文字
+    
+    bg_img = random.choice(bg_imgs)
+    bg_r, bg_c, _ = bg_img.shape
+    res_w, res_h = 384, 32
+
+    x = np.random.randint(0, bg_c-res_w)
+    y = np.random.randint(0, bg_r-res_h)
+
+    res_img = bg_img[y:y+res_h, x:x+res_w].copy()
+    
+    # 随机选取的背景图
+    res_img = cv2.cvtColor(res_img, cv2.COLOR_BGR2GRAY)
+
+    # 叠加渐变图
+    black2white = np.full((32, 384), 0, dtype=np.uint8)
+    if text in ui_names_pickup_like:
+        white_thre = 384
+        # white_thre = 180
+        for i in range(384):
+            pixel = i * 0.3
+            black2white[:, i] = pixel
+            if pixel > white_thre:
+                black2white[:, i] = white_thre
+        # 以比例混合
+        cv2.addWeighted(black2white, 0.5, res_img, 0.5, 0, res_img)
+
+        min_count_val = random.randint(100, 255)
+        # min_count_val = white_thre//2+100
+
+        rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
+        # img = cv2.addWeighted(rand_img, 0.2, img, 0.8, 0, img)
+        # 将img中的白色像素点的值变为rand_img中的值，使用opencv的bitwise_and
+        img = cv2.bitwise_and(rand_img, rand_img, mask=img)
+
+        # 随机权重叠加字和背景
+        wdg = random.uniform(0.1, 0.5)
+        # wdg = 0.4
+        res_img = cv2.addWeighted(res_img, wdg, img, 1-wdg, 0, res_img)
+
+        # res_img 随机乘以一个系数
+        max_pixel = res_img.max()
+        max_ratio = 255 / max_pixel
+        res_img = res_img * random.uniform(0.7, max_ratio)
+
+        res_img = res_img.astype(np.uint8)
+
+        res_img = Image.fromarray(res_img)
+        return res_img, text
+    else: # in ui_names_raw_mix
+        min_count_val = random.randint(50, 255)
+        rand_img = np.full((32, 384), min_count_val, dtype=np.uint8)
+        # img = cv2.addWeighted(rand_img, 0.2, img, 0.8, 0, img)
+        # 将img中的白色像素点的值变为rand_img中的值，使用opencv的bitwise_and
+        img = cv2.bitwise_and(rand_img, rand_img, mask=img)
+
+        wdg = random.uniform(0.1, 0.3)
+        res_img = cv2.addWeighted(res_img, wdg, img, 1-wdg, 0, res_img)
+
+        res_img = res_img.astype(np.uint8)
+
+        res_img = Image.fromarray(res_img)
+        return res_img, text
+
+
+# mix pickup and ui
+def generate_mix_image(pickup_rand_func=random_text, pickup_genshin_ratio=0.5, pickup_ratio=0.5):
+    if random.random() < pickup_ratio:
+        return generate_pickup_image(pickup_rand_func, pickup_genshin_ratio)
+    else:
+        return generate_ui_image()
+
 
 # Generate and return sample before/after pre_process
 # 已弃用

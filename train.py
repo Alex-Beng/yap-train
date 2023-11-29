@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
 from mona.nn.svtr import SVTRNet
-from mona.datagen.datagen import generate_image, generate_mix_image, random_text, random_text_genshin_distribute
+from mona.datagen.datagen import generate_pure_bg_image, generate_pickup_image, random_text, random_text_genshin_distribute, generate_mix_image
 from mona.config import config
 from mona.nn import predict as predict_net
 from mona.nn.model2 import Model2
@@ -16,7 +16,7 @@ import datetime
 from time import sleep
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-# device = "cuda"
+# device = "cpu"
 
 # a list of target strings
 def get_target(s):
@@ -94,9 +94,13 @@ def train():
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
     only_genshin = config['data_only_genshin']
-    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin, ratio=config['data_genshin_ratio']) if config["online_train"] else MyDataSet(
+    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
+                                    pk_ratio=config["pickup_ratio"],
+                                     pk_genshin_ratio=config['data_genshin_ratio']) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
-    validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=only_genshin) if config["online_val"] else MyDataSet(
+    validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=True, 
+                                       pk_ratio=config["pickup_ratio"],
+                                       pk_genshin_ratio=config['data_genshin_ratio']) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
     train_loader = DataLoader(train_dataset, shuffle=True, num_workers=config["dataloader_workers"], batch_size=config["batch_size"],)
@@ -193,14 +197,15 @@ class AddGaussianNoise(object):
 
 
 class MyOnlineDataSet(Dataset):
-    def __init__(self, size: int, is_val: bool=False, ratio: float=0.5):
+    def __init__(self, size: int, is_val: bool=False, pk_ratio: float=0.5, pk_genshin_ratio: float=0.5):
         self.size = size
         self.is_val = is_val
         if is_val:
             self.gen_func = random_text_genshin_distribute
         else:
             self.gen_func = random_text
-        self.rt = ratio
+        self.pk_rt = pk_ratio
+        self.pk_g_rt = pk_genshin_ratio
 
             
         # 创建生成图像的协程
@@ -208,14 +213,14 @@ class MyOnlineDataSet(Dataset):
         # import asyncio
         # self.queue = asyncio.Queue()
         # self.loop = asyncio.get_event_loop()
-        # async def generate_image(queue):
+        # async def generate_pure_bg_image(queue):
         #     while True:
-        #         im, text = generate_mix_image()
+        #         im, text = generate_pickup_image()
         #         # im = transforms.ToTensor()(im)
         #         while self.queue.qsize() > 600:
         #             await asyncio.sleep(0.1)
         #         await self.queue.put((im, text))
-        # self.loop.create_task(generate_image(self.queue))
+        # self.loop.create_task(generate_pure_bg_image(self.queue))
     def get_xy(self):
         loop = self.loop
         im, text = loop.run_until_complete(self.queue.get())
@@ -225,7 +230,8 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, text = generate_mix_image(self.gen_func, self.rt)
+        # im, text = generate_pickup_image(self.gen_func, self.pk_g_rt)
+        im, text = generate_mix_image(self.gen_func, self.pk_g_rt, self.pk_rt)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
         text = text.strip()

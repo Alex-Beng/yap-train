@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 
 # from mona.text.stat import random_stat, random_value
-from mona.datagen.datagen import generate_image, generate_image_sample, generate_mix_image, random_text_genshin_distribute
+from mona.datagen.datagen import generate_pure_bg_image, generate_image_sample, generate_pickup_image, random_text_genshin_distribute, generate_ui_image, generate_mix_image
 from train import train
 from mona.config import config
 
@@ -18,6 +18,8 @@ if __name__ == "__main__":
     if sys.argv[1] == "gen":
         train_size = config["train_size"]
         validate_size = config["validate_size"]
+        pk_ratio = config["pickup_ratio"]
+        data_genshin_ratio = config["data_genshin_ratio"]
 
         folder = pathlib.Path("data")
         if not folder.is_dir():
@@ -27,8 +29,9 @@ if __name__ == "__main__":
         y = []
         cnt = 0
         for _ in range(train_size):
-            # im, text = generate_image()
-            im, text = generate_mix_image()
+            # im, text = generate_pure_bg_image()
+            # im, text = generate_pickup_image()
+            im, text = generate_mix_image(random_text_genshin_distribute, data_genshin_ratio, pk_ratio)
             tensor = transforms.ToTensor()(im)
             tensor = torch.unsqueeze(tensor, dim=0)
             x.append(tensor)
@@ -45,7 +48,8 @@ if __name__ == "__main__":
         x = []
         y = []
         for _ in range(validate_size):
-            # im, text = generate_image()
+            # im, text = generate_pure_bg_image()
+            # im, text = generate_pickup_image()
             im, text = generate_mix_image()
             tensor = transforms.ToTensor()(im)
             tensor = torch.unsqueeze(tensor, dim=0)
@@ -60,6 +64,7 @@ if __name__ == "__main__":
 
         # generate sample
         for i in range(50):
+            # im, text = generate_pickup_image()
             im, text = generate_mix_image()
             im.save(f"data/sample_{i}.png")
     elif sys.argv[1] == "train":
@@ -71,9 +76,11 @@ if __name__ == "__main__":
             os.mkdir(folder)
 
         for i in range(100):
+            # im, text = generate_pickup_image(random_text_genshin_distribute, 0)
             im, text = generate_mix_image(random_text_genshin_distribute, 0)
             text = text.replace("/", "_")
             text = text.replace("?", "_")
+            text = text.replace(":", "_")
             im.save(f"samples/{i}_{text}.png")
             # img_processed.save((f"samples/{i}_p.png"))
     elif sys.argv[1] == 'sample2':
@@ -84,3 +91,11 @@ if __name__ == "__main__":
         for i in range(100):
             im, text = generate_image_sample()
             im.save(f"samples2/{i}.png")
+    elif sys.argv[1] == 'sample3':
+        folder = pathlib.Path("samples3")
+        if not folder.is_dir():
+            os.mkdir(folder)
+
+        for i in range(100):
+            im, text = generate_ui_image()
+            im.save(f"samples3/{i}.png")

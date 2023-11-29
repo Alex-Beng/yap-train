@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 from mona.text import index_to_word
 from mona.nn.model import Model
 from mona.nn.model2 import Model2
-from mona.datagen.datagen import generate_image, generate_mix_image, random_text, random_text_genshin_distribute
+from mona.datagen.datagen import generate_pure_bg_image, generate_pickup_image, random_text, random_text_genshin_distribute, generate_mix_image
 from mona.config import config
 from mona.nn import predict as predict_net
 
@@ -32,6 +32,7 @@ class MyOnlineDataSet(Dataset):
         return self.size
 
     def __getitem__(self, index):
+        # im, text = generate_pickup_image(random_text_genshin_distribute)
         im, text = generate_mix_image(random_text_genshin_distribute)
         tensor = transforms.ToTensor()(im)
         text = text.strip()
