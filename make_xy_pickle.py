@@ -24,6 +24,22 @@ ALL_NAMES = ALL_NAMES + [
 
 ALL_NAMES = set(ALL_NAMES)
 
+# 从ALL_NAMES中找到最相似的名字
+def find_most_similar_name(name: str) -> str:
+    if name in ALL_NAMES:
+        return name
+    max_sim = 0
+    max_sim_name = ""
+    for n in ALL_NAMES:
+        sim = 0
+        for c in name:
+            if c in n:
+                sim += 1
+        if sim > max_sim:
+            max_sim = sim
+            max_sim_name = n
+    return max_sim_name
+
 genshin_x = js_ld('../yap/xx.json')
 genshin_y = js_ld('../yap/yy.json')
 
@@ -35,6 +51,35 @@ def text_all_in_lexicon(text):
         if c not in lexicon:
             return False
     return True
+
+if False:
+    fix_pair = []
+    for i in range(len(genshin_y)):
+        if not text_all_in_lexicon(genshin_y[i]):
+            simi = find_most_similar_name(genshin_y[i])
+            
+            img = cv2.imread(os.path.join('../yap/', genshin_x[i]))
+            cv2.imshow('img', img)
+            print(f'{genshin_y[i]} -> {simi}')
+            print(f'{genshin_x[i]} -> {genshin_y[i]}')
+            k = cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+            if k == ord('a'):
+                fix_pair.append((genshin_x[i], simi))
+            elif k == ord('f'):
+                fix_pair.append((genshin_x[i], fix_pair[-1][1]))
+            elif k == ord('s'):
+                lb = input('input label: ')
+                fix_pair.append((genshin_x[i], lb))
+    import json
+    json.dump(fix_pair, open('fix_pair.json', 'w', encoding='utf-8'), ensure_ascii=False)
+    exit()
+# dumps4.0_tx/574_4_的_raw.jpg
+# dumps4.0_tx/1969_4_机天正_raw.jpg
+# dumps4.0_tx3/323_2_破损的面具_raw.jpg
+# dumps4.0_tx4/254_4_号_raw.jpg
+# dumps4.0_tx4/1110_4_的_raw.jpg
+# dumps4.0_syfs/270_3_地脉的旧_raw.jpg
 
 genshin_x = [genshin_x[i] for i in range(len(genshin_x)) if text_all_in_lexicon(genshin_y[i])]
 genshin_y = [genshin_y[i] for i in range(len(genshin_y)) if text_all_in_lexicon(genshin_y[i])]
