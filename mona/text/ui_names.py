@@ -6,6 +6,9 @@ from .domains import domain_names
 # 2. 直接与背景叠加的
 # 3. 纯色背景，且是白色为底的
 ui_names_pickup_like = [
+    # for treasure killer
+    "点击进入",
+
     # press Y
     "进入世界申请（",
     "秘境挑战组队邀请",
@@ -105,6 +108,9 @@ ui_names_raw_mix = [
     # click plot
     "自动",
     "播放中",
+
+    # for treasure killer
+    "岛上无贼",
 ]
 ui_names_pure = [
     # press Space
