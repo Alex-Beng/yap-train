@@ -119,7 +119,7 @@ res_img = cv2.add(res_img, img)
 ![gauss](./imgs/1.PNG)
 
 **BTW，来猜一猜哪些是生成的哪些是真实的。**
-~~此外，由于真实数据中由于阈值造成的噪声，见上图的87、92、97等图，生成数据时使用了一半的真实数据，另一半为生成数据，实现见[datagen.py](./mona/datagen/datagen.py)中的`generate_mix_image()`函数。~~ 
+~~此外，由于真实数据中由于阈值造成的噪声，见上图的87、92、97等图，生成数据时使用了一半的真实数据，另一半为生成数据，实现见[datagen.py](./mona/datagen/datagen.py)中的`generate_pickup_image()`函数。~~ 
 
 
 ~~标注的真实数据有26590张，其中14260张为空白图。（整理完再放上来吧）~~
