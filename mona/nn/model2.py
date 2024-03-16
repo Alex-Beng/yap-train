@@ -133,6 +133,12 @@ class Model2(nn.Module):
                     # using word map to fill the known part of the linear2
                     if k != "linear2.weight" and k != "linear2.bias":
                         print(f"fail to load {k}")
+                        continue
+                    # still need to check the linear2's mat size
+                    if v.size()[1] != model_dict[k].size()[1]:
+                        print(f"size dismatch: {k}, {v.size()} -> {model_dict[k].size()}")
+                        continue
+
                     old_idx2word = json.load(open(old_idx2word_path, "r", encoding="utf-8"))
                     # make the key from str -> num
                     old_idx2word = {int(k): v for k, v in old_idx2word.items()}
