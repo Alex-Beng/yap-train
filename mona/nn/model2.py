@@ -135,7 +135,7 @@ class Model2(nn.Module):
                         print(f"fail to load {k}")
                         continue
                     # still need to check the linear2's mat size
-                    if v.size()[1] != model_dict[k].size()[1]:
+                    if len(v.size()) > 1 and v.size()[1] != model_dict[k].size()[1]:
                         print(f"size dismatch: {k}, {v.size()} -> {model_dict[k].size()}")
                         continue
 
