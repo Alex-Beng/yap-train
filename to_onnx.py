@@ -13,10 +13,12 @@ from mona.text import word_to_index, index_to_word
 from mona.datagen.datagen import generate_pure_bg_image,generate_pickup_image, generate_mix_image
 
 
+# TODO: make path configurable
 model_folder = "models"
 name = "model_training.pt"
+name = "model_best.pt"
 # name = "model_acc100-epoch860.pt"
-# name = "model_acc9999-epoch800.pt"
+# name = "model_acc9999-epoch1.pt"
 onnx_name = name.rsplit(".", 2)[0] + ".onnx"
 onnx_name = "model_training.onnx"
 # net = Model(len(word_to_index))
@@ -75,6 +77,7 @@ ort_inputs = {ort_session.get_inputs()[0].name: x.numpy()}
 
 import time
 beg_time = time.time()
+# for _ in range(10000):
 ort_outs = ort_session.run(None, ort_inputs)
 
 print(f"onnxruntime inference time: {time.time() - beg_time}")
