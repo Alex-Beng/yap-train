@@ -109,7 +109,8 @@ def train():
     validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
-    optimizer = optim.Adadelta(net.parameters())
+    # optimizer = optim.Adadelta(net.parameters())
+    optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
