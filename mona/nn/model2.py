@@ -76,7 +76,7 @@ from mona.text import index_to_word, word_to_index
 
 
 class Model2(nn.Module):
-    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=120, num_heads=8):
+    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=192, num_heads=8):
         super(Model2, self).__init__()
         self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
         self.pe = PositionalEncoding(dim=hidden_channels, length=24)
