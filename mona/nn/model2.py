@@ -84,7 +84,7 @@ class Model2(nn.Module):
         # 添加一个batchnorm
         # self.bm = nn.BatchNorm1d(24)
         # 添加一个dropout
-        # self.dp = nn.Dropout(0.1)
+        self.dp = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
         self.blocks = nn.Sequential()
         for i in range(depth):
@@ -111,6 +111,7 @@ class Model2(nn.Module):
         # x = self.bm(x)
         # x = self.dp(x)
         x = self.linear1(x)
+        x = self.dp(x)
         x = self.blocks(x)
         x = self.norm(x)
         x = self.linear2(x)
