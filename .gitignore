@@ -16,3 +16,8 @@ samples2/
 *.text
 *.txt
 snap_api_update.py
+cao.py
+fix_pair.json
+sleep_train.sh
+train.sh
+ttest.py
