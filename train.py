@@ -15,8 +15,8 @@ from mona.nn.model2 import Model2
 import datetime
 from time import sleep
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-# device = "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+device = config["device"]
 
 # a list of target strings
 def get_target(s):
