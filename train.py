@@ -51,9 +51,11 @@ def validate(net, validate_loader):
             predict = predict_net(net, x)
             # print(predict)
             correct += sum([1 if predict[i] == label[i] else 0 for i in range(len(label))])
-            errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] ]
-            if len(errs):
+            errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] and not ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")]
+            if len(errs) < 5:
                 print(errs)
+            else:
+                print(f'too many errors: {len(errs)}')
             total += len(label)
 
     net.train()
