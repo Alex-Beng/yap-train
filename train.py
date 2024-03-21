@@ -118,6 +118,7 @@ def train():
     print_per = config["print_per"]
     save_per = config["save_per"]
     batch = 0
+    curr_best_acc = -1
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
@@ -140,6 +141,8 @@ def train():
 
             input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
+            # 添加正则化loss
+            # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
             loss.backward()
             optimizer.step()
 
@@ -147,11 +150,12 @@ def train():
 
             if batch % print_per == 0 and batch != 0:
                 tput = batch_size * batch / (cur_time - start_time).total_seconds()
-                print(f"{cur_time} e{epoch} #{batch} tput: {tput} loss: {loss.item()}")
+                print(f"{cur_time} e{epoch} #{batch} tput: {tput:.2f} loss: {loss.item()}")
                 # print("sleeping for a while")
                 # sleep(5)
 
             if batch % save_per == 0 and batch != 0:
+                print(f"curr best acc: {curr_best_acc}")
                 print("Validating and checkpointing")
                 rate = validate(net, validate_loader)
                 print(f"{cur_time} rate: {rate * 100}%")
@@ -161,6 +165,9 @@ def train():
                     torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
                 if int(rate*10000) >= 9999 and config["save_acc9999"]:
                     torch.save(net.state_dict(), f"models/model_acc9999-epoch{epoch}.pt")
+                if rate > curr_best_acc:
+                    torch.save(net.state_dict(), f"models/model_best.pt")
+                    curr_best_acc = rate
 
             batch += 1
 
