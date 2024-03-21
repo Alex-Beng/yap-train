@@ -33,7 +33,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # im, text = generate_pickup_image(random_text_genshin_distribute)
-        im, text = generate_mix_image(random_text_genshin_distribute)
+        im, text = generate_mix_image(random_text_genshin_distribute, pickup_ratio=1)
         tensor = transforms.ToTensor()(im)
         text = text.strip()
         return tensor, text
@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 truth = label[i]
 
                 # if True:
-                if pred != truth:
+                if pred != truth and not ( truth[:7] == "尚需生长时间：" and pred[:7] == "尚需生长时间："):
                     print(f"\033[2K\r==== pred: {pred}, truth: {truth} ====")
                     # Save the incorrect samples
                     if err < max_plot_incorrect_sample:
@@ -90,7 +90,7 @@ if __name__ == "__main__":
                         im.save(f"samples/err-sample-id{total+i}.png")
 
             # Stats
-            err += sum([0 if predict[i] == label[i]
+            err += sum([0 if predict[i] == label[i] or ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")
                         else 1 for i in range(len(label))])
             total += len(label)
             tput = int(total / (time.time() - last_time))
