@@ -13,6 +13,7 @@ SVTR training from Yas-Train, and CenterNet training
 
 ## 增加了CenterNet的训练支持（cannot work now）
 
+**目前弃用**，尚未完全支持目标检测。
 
 CenterNet用于目标检测。yas-train仅训练SVTR用于不定长文字识别。
 
