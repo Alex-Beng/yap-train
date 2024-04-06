@@ -87,20 +87,12 @@ class EulaDataset(Dataset):
     def __len__(self):
         return self.length
     
-    def generate_image(self):
+    def generate_pure_bg_image(self):
         # raw: 380x67 image and (F_label_x, F_label_y)
         # return: 384x64 and its label
 
-        rand_bg = random.choice(self.bg_images)
-        
-        bg_r, bg_c, _ = rand_bg.shape
+        res_img = self.generate_empty_image()
         res_w, res_h = 67, 380
-
-        # random crop the b_img
-        x = np.random.randint(0, bg_c-res_w)
-        y = np.random.randint(0, bg_r-res_h)
-        # need deepcopy
-        res_img = rand_bg[y:y+res_h, x:x+res_w].copy()
 
         F_x = np.random.randint(0, 10)
         F_y = np.random.randint(0, res_h-33)
@@ -139,9 +131,35 @@ class EulaDataset(Dataset):
         
         return res_img, (F_label_x, F_label_y)
 
+    def generate_empty_image(self):
+        rand_bg = random.choice(self.bg_images)
+        
+        bg_r, bg_c, _ = rand_bg.shape
+        res_w, res_h = 67, 380
+
+        # random crop the b_img
+        x = np.random.randint(0, bg_c-res_w)
+        y = np.random.randint(0, bg_r-res_h)
+        # need deepcopy
+        res_img = rand_bg[y:y+res_h, x:x+res_w].copy()
+        
+        # res_img = Image.fromarray(res_img)
+        return res_img
 
     def __getitem__(self, index):
-        img, label = self.generate_image()
+        empty_rd = random.random()
+        if empty_rd < 0.1:
+            img = self.generate_empty_image()
+            img = cv2.resize(img, (64, 384), interpolation=cv2.INTER_AREA)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            img = Image.fromarray(img)
+            img = transforms.ToTensor()(img)
+            return img, np.zeros((self.output_shape[0], self.output_shape[1], self.num_classes), dtype=np.float32), \
+                np.zeros((self.output_shape[0], self.output_shape[1], 2), dtype=np.float32), \
+                np.zeros((self.output_shape[0], self.output_shape[1]), dtype=np.float32)
+
+        img, label = self.generate_pure_bg_image()
 
         # 生成 centernet 结果
         hm  = np.zeros((self.output_shape[0], self.output_shape[1], self.num_classes), dtype=np.float32)

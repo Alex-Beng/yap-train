@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import cv2
 import torch
@@ -27,10 +28,19 @@ class AddGaussianNoise(object):
         return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 
 def load_bg_imgs():
-    return [cv2.imread("./assets/test.png")]
+    path = "../yap/dumps_full/"
+    # 获取文件夹下所有图片
+    files = os.listdir(path)
+    # 读取图片
+    imgs = []
+    for file in files:
+        imgs.append(cv2.imread(path + file))
+    return imgs
 
 
 def train():
+    loss_log_file = open("loss_log.txt", "a+")
+
     net = CenterNet_MobilenetV3Small(config["num_classes"]).to(device)
     if config["pretrain"]:
         net.load_state_dict(
@@ -45,10 +55,10 @@ def train():
                 # transforms.GaussianBlur(7,7),
             ])], p=0.5),
 
-        transforms.RandomApply([
-            transforms.RandomCrop(size=(384, 64)),
-            transforms.Resize((384, 64)),
-            ], p=0.5),
+        # transforms.RandomApply([
+        #     transforms.RandomCrop(size=(384, 64)),
+        #     transforms.Resize((384, 64)),
+        #     ], p=0.5),
 
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
@@ -73,6 +83,8 @@ def train():
     save_per = config["save_per"]
     batch_cnt = 0
     start_time = datetime.datetime.now()
+
+    curr_best_loss = 1000000000
     for epoch in range(config['init_epoch'], epoch):
         for batch in train_loader:
             optimizer.zero_grad()
@@ -92,7 +104,9 @@ def train():
 
             c_loss = focal_loss(batch_hms_pred, batch_hms)
             off_loss = reg_l1_loss(batch_regs_pred, batch_regs, batch_reg_msks)
-            loss = c_loss + off_loss
+            # print(c_loss, off_loss)
+            loss =  c_loss + off_loss
+            # loss = c_loss
 
             loss.backward()
             optimizer.step()
@@ -100,11 +114,21 @@ def train():
             cur_time = datetime.datetime.now()
             if batch_cnt % print_per == 0 and batch_cnt != 0:
                 tput = batch_size * batch_cnt / (cur_time - start_time).total_seconds()
-                print(f"Epoch {epoch}, Batch {batch_cnt}, Loss {loss}, Throughput {tput}")
+                print(f"Epoch {epoch}, Batch {batch_cnt}, Loss {loss:.8f}, tput: {tput:.8f}, c_loss_rate: {c_loss / loss:.8f}")
             
             if batch_cnt % save_per == 0 and batch_cnt != 0:
                 torch.save(net.state_dict(), f"models/eula/model_training.pt")
                 print("Model saved")
+                if loss < curr_best_loss:
+                    torch.save(net.state_dict(), f"models/eula/model_best.pt")
+
+                    # refresh the file
+                    
+                    loss_log_file = open("loss_log.txt", "a+") if loss_log_file.closed else loss_log_file
+                    print(f"Model saved with loss: {loss}", file=loss_log_file)
+                    loss_log_file.close()
+                    
+                    curr_best_loss = loss
             batch_cnt += 1
 
 
