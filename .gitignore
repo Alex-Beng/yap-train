@@ -21,3 +21,5 @@ fix_pair.json
 sleep_train.sh
 train.sh
 ttest.py
+/runs/
+/graph.*
