@@ -111,3 +111,32 @@ class MobileNetV3Small(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+
+# 实际上这才是正经原版的MobileNetV3Small
+class MobileNetV3Small_GT(nn.Module):
+    def __init__(self, out_size, in_channels=3):
+        super(MobileNetV3Small_GT, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, 16, kernel_size=(3, 3), stride=(2, 2), padding=1), # -> H // 2, W // 2
+            nn.BatchNorm2d(16),
+            nn.Hardswish(),
+
+            MobileNetV3Block(16, 16, exp_size=16, has_se=True, nl="RE", kernel_size=(3, 3), stride=(2, 2)),
+            MobileNetV3Block(16, 24, exp_size=64, has_se=False, nl="RE", kernel_size=(3, 3), stride=(2, 2)),           # original (2, 2)
+            MobileNetV3Block(24, 24, exp_size=88, has_se=False, nl="RE", kernel_size=(3, 3), stride=(1, 1)),
+            MobileNetV3Block(24, 40, exp_size=96, has_se=True, nl="HS", kernel_size=(5, 5), stride=(2, 2)),            # original (2, 2)
+            MobileNetV3Block(40, 40, exp_size=240, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),
+            MobileNetV3Block(40, 40, exp_size=240, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),
+            MobileNetV3Block(40, 48, exp_size=120, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),
+            MobileNetV3Block(48, 48, exp_size=144, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),
+            MobileNetV3Block(48, 96, exp_size=288, has_se=True, nl="HS", kernel_size=(5, 5), stride=(2, 2)),           # original (2, 2)
+            MobileNetV3Block(96, 96, exp_size=576, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),
+            MobileNetV3Block(96, 96, exp_size=576, has_se=True, nl="HS", kernel_size=(5, 5), stride=(1, 1)),   # N, 96, H // 32, W // 32
+
+            nn.Conv2d(96, out_size, kernel_size=(1, 1), stride=(1, 1)),  # N, out_size, H // 32, W // 32
+            SE(out_size),
+        )
+
+    def forward(self, x):
+        return self.conv(x)
