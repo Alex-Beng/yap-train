@@ -40,7 +40,8 @@ class Model_GT(nn.Module):
             self.blocks.add_module(f"mix{i}", block)
         self.norm = nn.LayerNorm(hidden_channels)
         # 变成回归头，而不是分类头
-        self.linear2 = nn.Linear(hidden_channels, 1)
+        # 0 for the MAN, 1 for the VEIW
+        self.linear2 = nn.Linear(hidden_channels, 2)
 
     def forward(self, x):
         x = self.cnn(x)
