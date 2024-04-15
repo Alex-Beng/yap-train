@@ -38,6 +38,9 @@ fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(85, 104)]
 
 def load_bg_imgs():
     path = "../yap/dumps_full_mona2/"
+    # check path exists
+    if not os.path.exists(path):
+        return []
     # 获取文件夹下所有图片
     files = os.listdir(path)
     # 读取图片
@@ -339,12 +342,20 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 # 使用pickle读入预先存放的arrays，省去随机读取的时间
+# TODO: remove this tryd
 try:
     genshin_x_imgs = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
     genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
 except:
-    genshin_x_imgs = pickle.load(lzma.open('D:/genshin_x_imgs.pkl', 'rb'))
-    genshin_y = pickle.load(lzma.open('D:/genshin_y.pkl', 'rb'))
+    backup_path = "D:/"
+    backup_x_path = os.path.join(backup_path, 'genshin_x_imgs.pkl')
+    backup_y_path = os.path.join(backup_path, 'genshin_y.pkl')
+    if os.path.exists(backup_x_path) and os.path.exists(backup_y_path):
+        genshin_x_imgs = pickle.load(lzma.open(backup_x_path, 'rb'))
+        genshin_y = pickle.load(lzma.open(backup_y_path, 'rb'))
+    else:
+        genshin_x_imgs = []
+        genshin_y = []
 
 
 assert(len(genshin_x_imgs) == len(genshin_y))
