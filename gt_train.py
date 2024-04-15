@@ -23,6 +23,7 @@ def validate(net, validate_loader):
         for x, label in validate_loader:
             x = x.to(device)
             y_hat = net(x)
+            label = label.to(device)
             # calculate the L1 loss
             loss = F.l1_loss(y_hat, label, reduction="mean")
             print(f"Validation loss: {loss.item()}")
