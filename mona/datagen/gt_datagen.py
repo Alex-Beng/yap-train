@@ -51,7 +51,7 @@ def gen_view_mask():
 
     h,w = flipped.shape
 
-    radius = randint(70, 110)
+    radius = randint(70, 120)
     print(radius)
 
     new_image = np.zeros(shape=(h,radius+w),dtype=np.uint8)
@@ -62,6 +62,12 @@ def gen_view_mask():
     
     # set the new_image
     new_image[v_beg:v_beg+v_angle, :] = 255
+    # 添加从左到右的渐变
+    # from v_beg -> v_beg+v_angle; 0 -> radius
+    for i in range(v_beg, v_beg+v_angle):
+        for j in range(radius):
+            new_image[i, j] = 255 * (1 - j / radius)
+    
 
 
     new_image[: ,w2-w:w2] = flipped
@@ -115,7 +121,7 @@ def generate_image():
     view_mask = gen_view_mask().astype(np.float32).reshape((224, 224, 1))
 
     # add weight with the view mask
-    mix_ratio = uniform(0.3, 0.7)
+    mix_ratio = uniform(0.1, 0.5)
     print(cropped_map.shape, view_mask.shape)
     cv2.imshow('crop0', cropped_map.astype(np.uint8))
     cropped_map = cropped_map * (1 - mix_ratio) + view_mask * mix_ratio
@@ -153,7 +159,7 @@ def generate_image():
 
     cropped_map[112 - avt_h//2:112 + avt_h//2, 112 - avt_w//2:112 + avt_w//2] = map_roi
     
-    cv2.imshow('map', cropped_map)
+    cv2.imshow('map', cropped_map.astype(np.uint8))
     cv2.waitKey(0)
 
     
