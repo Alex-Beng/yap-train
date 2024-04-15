@@ -23,3 +23,4 @@ train.sh
 ttest.py
 /runs/
 /graph.*
+map_cache.pkl
