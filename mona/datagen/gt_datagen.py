@@ -3,7 +3,8 @@ import numpy as np
 from PIL import Image
 import cv2
 import pickle
-from random import randint, choice
+from random import randint, choice, uniform
+from copy import deepcopy
 
 # read all the map into memo for speed up
 
@@ -43,6 +44,48 @@ avatar_img = Image.open(os.path.join(REPO_ROOT, 'Avatar.png'))
 avatar_img = cv2.cvtColor(np.array(avatar_img), cv2.COLOR_RGBA2BGRA)
 
 
+def gen_view_mask():
+    flipped = np.ones(shape=(360, 20), dtype=np.uint8)
+
+    cv2.imshow('flipped',flipped)
+
+    h,w = flipped.shape
+
+    radius = randint(70, 110)
+    print(radius)
+
+    new_image = np.zeros(shape=(h,radius+w),dtype=np.uint8)
+    h2,w2 = new_image.shape
+
+    v_angle = randint(70, 90)
+    v_beg = randint(0, 360 - v_angle)
+    
+    # set the new_image
+    new_image[v_beg:v_beg+v_angle, :] = 255
+
+
+    new_image[: ,w2-w:w2] = flipped
+    # new_image = ~new_image
+    print(new_image.shape)
+
+    cv2.imshow('polar',new_image)
+
+    h,w = new_image.shape
+
+    center = (112, 112) 
+
+    maxRadius = 112
+
+    output= cv2.warpPolar(new_image, center=center, maxRadius=radius, dsize=(maxRadius*2,maxRadius*2), flags=cv2.WARP_INVERSE_MAP + cv2.WARP_POLAR_LINEAR + cv2.WARP_FILL_OUTLIERS)
+    print(output.shape)
+
+    cv2.imshow('output',output)
+    cv2.waitKey(0)
+
+    return output
+
+
+
 def generate_image():
     # return 224x224 image + [angle_norm1, angle_norm2]
     # in which angle_norm in [-1, 1]
@@ -67,7 +110,16 @@ def generate_image():
     # random crop
     x = randint(0, w - 224)
     y = randint(0, h - 224)
-    cropped_map = rd_map[y:y+224, x:x+224]
+    cropped_map = deepcopy(rd_map[y:y+224, x:x+224]).astype(np.float32)
+
+    view_mask = gen_view_mask().astype(np.float32).reshape((224, 224, 1))
+
+    # add weight with the view mask
+    mix_ratio = uniform(0.3, 0.7)
+    print(cropped_map.shape, view_mask.shape)
+    cv2.imshow('crop0', cropped_map.astype(np.uint8))
+    cropped_map = cropped_map * (1 - mix_ratio) + view_mask * mix_ratio
+    cv2.imshow('crop', cropped_map.astype(np.uint8))
 
     # random rotate the avatar image
     avt_h, avt_w = avatar_img.shape[:2]
@@ -100,12 +152,10 @@ def generate_image():
     map_roi = map_roi + rotated_avatar
 
     cropped_map[112 - avt_h//2:112 + avt_h//2, 112 - avt_w//2:112 + avt_w//2] = map_roi
-
+    
     cv2.imshow('map', cropped_map)
     cv2.waitKey(0)
 
-    # add view mask
-    
     
     # TODO: implement this function
     # for now just return a random image and two random angle_norm
