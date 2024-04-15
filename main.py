@@ -9,6 +9,7 @@ import torchvision.transforms as transforms
 # from mona.text.stat import random_stat, random_value
 from mona.datagen.datagen import generate_pure_bg_image, generate_image_sample, generate_pickup_image, random_text_genshin_distribute, generate_ui_image, generate_mix_image
 from train import train
+from gt_train import train as gt_train
 from mona.config import config
 
 
@@ -69,6 +70,8 @@ if __name__ == "__main__":
             im.save(f"data/sample_{i}.png")
     elif sys.argv[1] == "train":
         train()
+    elif sys.argv[1] == "gt_train":
+        gt_train()
 
     elif sys.argv[1] == 'sample':
         folder = pathlib.Path("samples")

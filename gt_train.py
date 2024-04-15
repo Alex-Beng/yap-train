@@ -1,17 +1,13 @@
 # make it train guitou
 
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
+from torch.nn import functional as F
 
-from mona.text import index_to_word, word_to_index
-from mona.nn.model import Model
-from mona.nn.svtr import SVTRNet
 from mona.datagen.gt_datagen import generate_image
 from mona.config import gt_config as config
-from mona.nn import predict as predict_net
 from mona.nn.model_gt import Model_GT
 
 import datetime
@@ -20,52 +16,22 @@ from time import sleep
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 device = config["device"]
 
-# a list of target strings
-def get_target(s):
-    target_length = []
-
-    target_size = 0
-    for i, target in enumerate(s):
-        target_length.append(len(target))
-        target_size += len(target)
-
-    target_vector = []
-    for target in s:
-        for char in target:
-            index = word_to_index[char]
-            if index == 0:
-                print("error")
-            target_vector.append(index)
-
-    target_vector = torch.LongTensor(target_vector)
-    target_length = torch.LongTensor(target_length)
-
-    return target_vector, target_length
-
 
 def validate(net, validate_loader):
     net.eval()
-    correct = 0
-    total = 0
     with torch.no_grad():
         for x, label in validate_loader:
             x = x.to(device)
-            predict = predict_net(net, x)
-            # print(predict)
-            correct += sum([1 if predict[i] == label[i] else 0 for i in range(len(label))])
-            errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] and not ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")]
-            if len(errs) < 5:
-                print(errs)
-            else:
-                print(f'too many errors: {len(errs)}')
-            total += len(label)
-
+            y_hat = net(x)
+            # calculate the L1 loss
+            loss = F.l1_loss(y_hat, label, reduction="mean")
+            print(f"Validation loss: {loss.item()}")
     net.train()
-    return correct / total
+    return loss.item()
 
 
 def train():
-    net = Model_GT(len(index_to_word), 1).to(device)
+    net = Model_GT(1).to(device)
 
 
     if config["pretrain"]:
@@ -88,14 +54,10 @@ def train():
 
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
-    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
-                                    pk_ratio=config["pickup_ratio"],
-                                     pk_genshin_ratio=config['data_genshin_ratio']) if config["online_train"] else MyDataSet(
-        torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
-    validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=True, 
-                                       pk_ratio=config["pickup_ratio"],
-                                       pk_genshin_ratio=config['data_genshin_ratio']) if config["online_val"] else MyDataSet(
-        torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
+    train_dataset = MyOnlineDataSet(config['train_size']) if config["online_train"] \
+        else MyDataSet(torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
+    validate_dataset = MyOnlineDataSet(config['validate_size']) if config["online_val"] \
+        else MyDataSet(torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
     train_loader = DataLoader(train_dataset, shuffle=True, num_workers=config["dataloader_workers"], batch_size=config["batch_size"],)
     validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
@@ -104,13 +66,14 @@ def train():
     # optimizer = optim.Adadelta(net.parameters())
     optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
-    ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
     epoch = config["epoch"]
     print_per = config["print_per"]
     save_per = config["save_per"]
     batch = 0
-    curr_best_acc = -1
+    # 回归任务也只能用loss而不是acc了吧？
+    # 是不是1°之内就可以认为分类成功？
+    curr_best_loss = float("inf")
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
@@ -120,8 +83,8 @@ def train():
         for x, label in train_loader:
             # sleep(10)
             optimizer.zero_grad()
-            target_vector, target_lengths = get_target(label)
-            target_vector, target_lengths = target_vector.to(device), target_lengths.to(device)
+            target_vector = label
+            target_vector = target_vector.to(device)
             x = x.to(device)
 
             # Data Augmentation in batch
@@ -131,8 +94,7 @@ def train():
 
             y = net(x)
 
-            input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
-            loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
+            loss = F.l1_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
             loss.backward()
@@ -147,29 +109,17 @@ def train():
                 # sleep(5)
 
             if batch % save_per == 0 and batch != 0:
-                print(f"curr best acc: {curr_best_acc}")
+                print(f"curr best loss: {curr_best_loss}")
                 print("Validating and checkpointing")
-                rate = validate(net, validate_loader)
-                print(f"{cur_time} rate: {rate * 100}%")
-                torch.save(net.state_dict(), f"models/model_training.pt")
+                val_loss = validate(net, validate_loader)
+                print(f"{cur_time} loss: {val_loss}")
+                torch.save(net.state_dict(), f"models/gt/model_training.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
-                if rate == 1:
-                    torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
-                if int(rate*10000) >= 9999 and config["save_acc9999"]:
-                    torch.save(net.state_dict(), f"models/model_acc9999-epoch{epoch}.pt")
-                if rate > curr_best_acc:
-                    torch.save(net.state_dict(), f"models/model_best.pt")
-                    curr_best_acc = rate
+                if val_loss < curr_best_loss:
+                    torch.save(net.state_dict(), f"models/gt/model_best.pt")
+                    curr_best_loss = val_loss
 
             batch += 1
-
-    for x, label in validate_loader:
-        x = x.to(device)
-        # predict = net.predict(x)
-        predict = predict_net(net, x)
-        print("predict:     ", predict[:10])
-        print("ground truth:", label[:10])
-        break
 
 
 class MyDataSet(Dataset):
@@ -199,9 +149,8 @@ class AddGaussianNoise(object):
 
 
 class MyOnlineDataSet(Dataset):
-    def __init__(self, size: int, is_val: bool=False):
+    def __init__(self, size: int):
         self.size = size
-        self.is_val = is_val
 
     def __len__(self):
         return self.size
@@ -211,6 +160,5 @@ class MyOnlineDataSet(Dataset):
         im, label = generate_image()
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
-        text = text.strip()
 
-        return im, text
+        return im, label
