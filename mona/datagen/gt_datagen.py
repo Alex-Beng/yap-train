@@ -180,13 +180,15 @@ def generate_image():
     
     # 这样norm会有数值不稳定的问题
     # mid_angle, angle = mid_angle / 180, angle / 180
-    # 使用 sin 代替
-    mid_angle = np.sin(mid_angle / 180 * np.pi)
-    angle = np.sin(angle / 180 * np.pi)
-    
+    # 使用 sin, cos 代替
+    mid_angles = np.sin(mid_angle / 180 * np.pi), np.cos(mid_angle / 180 * np.pi)
+    angles = np.sin(angle / 180 * np.pi), np.cos(angle / 180 * np.pi)
+    # print(mid_angles, angles)
+    label = np.array([*mid_angles, *angles])
+    # print(label)
     # print(cropped_map.shape)
     res_img = Image.fromarray(cropped_map.astype(np.uint8))
-    label = np.array([mid_angle, angle])
+    # label = np.array([mid_angle, angle])
     return res_img, label
 
 

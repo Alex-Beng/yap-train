@@ -32,7 +32,7 @@ def validate(net, validate_loader):
 
 
 def train():
-    net = Model_GT(3).to(device)
+    net = Model_GT(3, out_size=4).to(device)
 
 
     if config["pretrain"]:
