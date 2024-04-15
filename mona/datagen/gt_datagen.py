@@ -63,10 +63,12 @@ def gen_view_mask():
     # set the new_image
     new_image[v_beg:v_beg+v_angle, :] = 255
     # 添加从左到右的渐变
+    # 添加一个阴影比例，随机增亮或变暗
+    shadow_ratio = uniform(0.9, 1.1)
     # from v_beg -> v_beg+v_angle; 0 -> radius
     for i in range(v_beg, v_beg+v_angle):
         for j in range(radius):
-            new_image[i, j] = 255 * (1 - j / radius)
+            new_image[i, j] = 255 * (1 - j / radius) * shadow_ratio
     
 
 
