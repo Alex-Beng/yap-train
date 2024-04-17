@@ -44,15 +44,15 @@ gt_config = {
     # 因为是正方形，所以只需要一个边长
     "side_len": 224,
     
-    "batch_size": 512, # 550 on 4GB gpu memo
+    "batch_size": 64, # 550 on 4GB gpu memo
     "epoch": 1000000,
     "print_per": 10,
     "save_per": 100,
 
     "train_size": 4096000,
-    "validate_size": 512000,
+    "validate_size": 5120,
 
-    "pretrain": False,
+    "pretrain": True,
     "pretrain_name": "model_best.pt",
     'lr': 1e-3,
 
