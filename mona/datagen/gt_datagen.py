@@ -80,14 +80,14 @@ def gen_view_mask():
     # from v_beg -> v_beg+v_angle; 0 -> radius
     for i in range(v_beg, v_beg+v_angle):
         for j in range(radius):
-            new_image[i, j] = 255 * (1 - j / radius) * shadow_ratio
+            new_image[i, j] = 255 * (1 - j / radius)
     
 
     new_image[: ,w2-w:w2] = flipped
     # new_image = ~new_image
     # print(new_image.shape)
 
-    # cv2.imshow('polar',new_image)
+    cv2.imshow('polar',new_image)
 
     h,w = new_image.shape
 
@@ -95,7 +95,7 @@ def gen_view_mask():
 
     maxRadius = 112
 
-    output= cv2.warpPolar(new_image, center=center, maxRadius=radius, dsize=(maxRadius*2,maxRadius*2), flags=cv2.WARP_INVERSE_MAP + cv2.WARP_POLAR_LINEAR + cv2.WARP_FILL_OUTLIERS)
+    output= cv2.warpPolar(new_image, center=center, maxRadius=radius, dsize=(maxRadius*2,maxRadius*2), flags=cv2.WARP_INVERSE_MAP + cv2.WARP_POLAR_LINEAR + cv2.WARP_FILL_OUTLIERS )
     # print(output.shape)
 
     # cv2.imshow('output',output)
@@ -135,10 +135,16 @@ def generate_image():
     view_mask = view_mask.astype(np.float32).reshape((224, 224, 1))
 
     # add weight with the view mask
-    mix_ratio = uniform(0.1, 0.5)
+    mix_ratio = uniform(0.4, 0.6)
+    # mix_ratio = 0.6
     # print(cropped_map.shape, view_mask.shape)
     # cv2.imshow('crop0', cropped_map.astype(np.uint8))
     cropped_map = cropped_map * (1 - mix_ratio) + view_mask * mix_ratio
+    # 还需要进行亮度补偿
+    refine_ratio = 1 / mix_ratio
+    # 需要按目前最大像素值约束refine_ratio
+    refine_ratio = min(refine_ratio, 255 / np.max(cropped_map))
+    cropped_map = cropped_map * refine_ratio
     # cv2.imshow('crop', cropped_map.astype(np.uint8))
 
     # random rotate the avatar image
@@ -184,16 +190,20 @@ def generate_image():
     mid_angles = np.sin(mid_angle / 180 * np.pi), np.cos(mid_angle / 180 * np.pi)
     angles = np.sin(angle / 180 * np.pi), np.cos(angle / 180 * np.pi)
     # print(mid_angles, angles)
-    label = np.array([*mid_angles, *angles])
-    # label = np.array([*mid_angles])
+    label = np.array([*mid_angles, *angles]).astype(np.float32)
     # print(label)
     # print(cropped_map.shape)
-    res_img = Image.fromarray(cropped_map.astype(np.uint8))
+    res_img = cropped_map.astype(np.uint8)
+    # res_img = cv2.cvtColor(cropped_map.astype(np.uint8), cv2.COLOR_BGR2GRAY)
+    cv2.imshow('res_img', res_img)
+    cv2.waitKey(0)
+    res_img = Image.fromarray(res_img)
     # label = np.array([mid_angle, angle])
     return res_img, label
 
 
 if __name__ == '__main__':
-    img, label = generate_image()
-    # img.show()
-    print(label)
+    while True:
+        img, label = generate_image()
+        # img.show()
+        print(label)
