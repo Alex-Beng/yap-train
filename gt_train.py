@@ -37,7 +37,7 @@ def train():
 
     if config["pretrain"]:
         # net.load_state_dict(torch.load(f"models/{config['pretrain_name']}", map_location=device))
-        net.load_can_load(torch.load(f"models/{config['pretrain_name']}", map_location=device))
+        net.load_can_load(torch.load(f"models/gt/{config['pretrain_name']}", map_location=device))
 
     data_aug_transform = transforms.Compose([
         transforms.RandomApply([
