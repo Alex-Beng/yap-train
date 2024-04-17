@@ -53,7 +53,12 @@ def train():
             transforms.Resize((config['side_len'], config['side_len']), antialias=True),
             ], p=0.5),
 
-        transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
+        transforms.RandomApply([
+            transforms.RandomCrop(size=(config['side_len']-20, config['side_len']-20)),
+            transforms.Resize((config['side_len'], config['side_len']), antialias=True),
+            ], p=0.5),
+
+        transforms.RandomApply([AddGaussianNoise(mean=0, std=10)], p=0.5),
     ])
     train_dataset = MyOnlineDataSet(config['train_size']) if config["online_train"] \
         else MyDataSet(torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
