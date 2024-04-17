@@ -185,6 +185,7 @@ def generate_image():
     angles = np.sin(angle / 180 * np.pi), np.cos(angle / 180 * np.pi)
     # print(mid_angles, angles)
     label = np.array([*mid_angles, *angles])
+    # label = np.array([*mid_angles])
     # print(label)
     # print(cropped_map.shape)
     res_img = Image.fromarray(cropped_map.astype(np.uint8))
