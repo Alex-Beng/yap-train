@@ -105,7 +105,7 @@ def gen_view_mask():
 
 
 
-def generate_image():
+def generate_image(expand2polar=False):
     # return 224x224 image + [angle_norm1, angle_norm2]
     # in which angle_norm in [-1, 1]
     # angle_norm = (rad - pi) / pi, rad in [0 2pi]
@@ -183,6 +183,21 @@ def generate_image():
     # print(mid_angle, angle)
     # cv2.imshow('map', cropped_map.astype(np.uint8))
     # cv2.waitKey(0)
+
+    if expand2polar:
+        # 将 224x224 展开到极坐标
+        res_img = cv2.linearPolar(cropped_map, (112, 112), 112, cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR)
+        # cv2.imshow('res_img', res_img.astype(np.uint8))
+        # cv2.waitKey(0)
+        
+        # 对于角度，直接归一化到 [-1, 1]
+        # 无需考虑数值稳定，因为已经展开到极坐标
+        mid_angle, angle = mid_angle / 180, angle / 180
+        label = np.array([mid_angle, angle]).astype(np.float32)
+        res_img = res_img.astype(np.uint8)
+        res_img = Image.fromarray(res_img)
+        return res_img, label
+
     
     # 这样norm会有数值不稳定的问题
     # mid_angle, angle = mid_angle / 180, angle / 180
@@ -204,6 +219,9 @@ def generate_image():
 
 if __name__ == '__main__':
     while True:
-        img, label = generate_image()
+        img, label = generate_image(expand2polar=True)
         # img.show()
+        img = np.array(img)
+        cv2.imshow('img', img)
+        cv2.waitKey(0)
         print(label)

@@ -27,17 +27,17 @@ def validate(net, validate_loader):
             y_hat = net(x)
             label = label.to(device)
             # calculate the L1 loss
-            loss = F.l1_loss(y_hat, label, reduction="sum")
+            loss = F.l1_loss(y_hat, label, reduction="mean")
             # loss = F.mse_loss(y_hat, label, reduction="mean")
             # print(f"Validation loss: {loss.item()}")
             total += loss.item()
-            cnt += x.size(0)
+            cnt += 1
     net.train()
     return total / cnt
 
 
 def train():
-    net = Model_GT(3, out_size=4).to(device)
+    net = Model_GT(3, hidden_channels=512, out_size=4).to(device)
 
 
     if config["pretrain"]:
@@ -58,10 +58,10 @@ def train():
             transforms.Resize((config['side_len'], config['side_len']), antialias=True),
             ], p=0.5),
 
-        transforms.RandomApply([
-            transforms.RandomCrop(size=(config['side_len']-20, config['side_len']-20)),
-            transforms.Resize((config['side_len'], config['side_len']), antialias=True),
-            ], p=0.5),
+        # transforms.RandomApply([
+        #     transforms.RandomCrop(size=(config['side_len']-20, config['side_len']-20)),
+        #     transforms.Resize((config['side_len'], config['side_len']), antialias=True),
+        #     ], p=0.5),
 
         transforms.RandomApply([AddGaussianNoise(mean=0, std=10)], p=0.5),
     ])
@@ -108,7 +108,7 @@ def train():
             loss = F.l1_loss(y, target_vector, reduction="mean")
             # loss = F.mse_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
-            # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
+            # loss += 0.0001 * torch.norm(net.reg_head.weight, p=1)
             loss.backward()
             optimizer.step()
 
@@ -169,7 +169,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, label = generate_image()
+        im, label = generate_image(expand2polar=False)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
 
