@@ -19,7 +19,7 @@ from time import sleep
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 device = config["device"]
 
-vali_cnt = 1
+vali_cnt = 0
 
 def validate(net, validate_loader):
     global vali_cnt
@@ -98,7 +98,7 @@ def train():
     for epoch in range(epoch):
         if config["freeze_backbone"] and epoch == config["unfreeze_backbone_epoch"]:
             net.unfreeze_backbone()
-        train_cnt = 1
+        train_cnt = 0
         for x, label in train_loader:
             # sleep(10)
             optimizer.zero_grad()
