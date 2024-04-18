@@ -10,7 +10,7 @@ from torch.utils.tensorboard import writer
 writer = writer.SummaryWriter()
 
 from mona.datagen.gt_datagen import generate_image
-from mona.config import gt_config as config
+from mona.config import gt_noexp_config as config
 from mona.nn.model_gt import Model_GT
 
 import datetime
@@ -32,8 +32,8 @@ def validate(net, validate_loader):
             y_hat = net(x)
             label = label.to(device)
             # calculate the L1 loss
-            loss = F.l1_loss(y_hat, label, reduction="mean")
-            # loss = F.mse_loss(y_hat, label, reduction="mean")
+            # loss = F.l1_loss(y_hat, label, reduction="mean")
+            loss = F.mse_loss(y_hat, label, reduction="mean")
             # print(f"Validation loss: {loss.item()}")
             total += loss.item()
             cnt += 1
@@ -44,12 +44,12 @@ def validate(net, validate_loader):
 
 
 def train():
-    net = Model_GT(3, hidden_channels=512, out_size=2).to(device)
+    net = Model_GT(3, hidden_channels=512, out_size=4).to(device)
 
 
     if config["pretrain"]:
         # net.load_state_dict(torch.load(f"models/{config['pretrain_name']}", map_location=device))
-        net.load_can_load(torch.load(f"models/gt/{config['pretrain_name']}", map_location=device))
+        net.load_can_load(torch.load(f"models/gt_noexp/{config['pretrain_name']}", map_location=device))
 
     data_aug_transform = transforms.Compose([
         transforms.RandomApply([
@@ -113,8 +113,8 @@ def train():
 
             y = net(x)
 
-            loss = F.l1_loss(y, target_vector, reduction="mean")
-            # loss = F.mse_loss(y, target_vector, reduction="mean")
+            # loss = F.l1_loss(y, target_vector, reduction="mean")
+            loss = F.mse_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.reg_head.weight, p=1)
 
@@ -136,10 +136,10 @@ def train():
                 print("Validating and checkpointing")
                 val_loss = validate(net, validate_loader)
                 print(f"{cur_time} loss: {val_loss}")
-                torch.save(net.state_dict(), f"models/gt/model_training.pt")
+                torch.save(net.state_dict(), f"models/gt_noexp/model_training.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if val_loss < curr_best_loss:
-                    torch.save(net.state_dict(), f"models/gt/model_best.pt")
+                    torch.save(net.state_dict(), f"models/gt_noexp/model_best.pt")
                     curr_best_loss = val_loss
 
             batch += 1
@@ -180,8 +180,12 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, label = generate_image(expand2polar=True)
+        im, label = generate_image(expand2polar=False)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
 
         return im, label
+if __name__ == "__main__":
+    train()
+    writer.close()
+    print("done!")

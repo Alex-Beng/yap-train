@@ -29,7 +29,7 @@ class Model_GT(nn.Module):
         self.pe = PositionalEncoding(dim=hidden_channels, length=49) 
 
         # 添加一个batchnorm
-        self.bm = nn.BatchNorm1d(49)
+        # self.bm = nn.BatchNorm1d(49)
         # 添加一个dropout
         self.dp = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
@@ -62,8 +62,8 @@ class Model_GT(nn.Module):
         x = x.flatten(2)
         x = x.permute((0, 2, 1))
         x = self.pe(x)
-        x = self.bm(x)
-        # x = self.dp(x)
+        # x = self.bm(x)
+        x = self.dp(x)
         x = self.linear1(x)
         # x = self.dp(x)
         x = self.blocks(x)
