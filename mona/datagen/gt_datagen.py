@@ -87,7 +87,7 @@ def gen_view_mask():
     # new_image = ~new_image
     # print(new_image.shape)
 
-    cv2.imshow('polar',new_image)
+    # cv2.imshow('polar',new_image)
 
     h,w = new_image.shape
 
@@ -195,8 +195,8 @@ def generate_image():
     # print(cropped_map.shape)
     res_img = cropped_map.astype(np.uint8)
     # res_img = cv2.cvtColor(cropped_map.astype(np.uint8), cv2.COLOR_BGR2GRAY)
-    cv2.imshow('res_img', res_img)
-    cv2.waitKey(0)
+    # cv2.imshow('res_img', res_img)
+    # cv2.waitKey(0)
     res_img = Image.fromarray(res_img)
     # label = np.array([mid_angle, angle])
     return res_img, label
