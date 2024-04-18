@@ -19,16 +19,21 @@ device = config["device"]
 
 def validate(net, validate_loader):
     net.eval()
+    total = 0
+    cnt = 0
     with torch.no_grad():
         for x, label in validate_loader:
             x = x.to(device)
             y_hat = net(x)
             label = label.to(device)
             # calculate the L1 loss
-            loss = F.l1_loss(y_hat, label, reduction="mean")
+            loss = F.l1_loss(y_hat, label, reduction="sum")
+            # loss = F.mse_loss(y_hat, label, reduction="mean")
             # print(f"Validation loss: {loss.item()}")
+            total += loss.item()
+            cnt += x.size(0)
     net.train()
-    return loss.item()
+    return total / cnt
 
 
 def train():
@@ -101,6 +106,7 @@ def train():
             y = net(x)
 
             loss = F.l1_loss(y, target_vector, reduction="mean")
+            # loss = F.mse_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
             loss.backward()
