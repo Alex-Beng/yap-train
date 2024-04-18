@@ -47,17 +47,17 @@ gt_config = {
     "batch_size": 64, # 550 on 4GB gpu memo
     "epoch": 1000000,
     "print_per": 10,
-    "save_per": 100,
+    "save_per": 800,
 
     "train_size": 4096000,
     "validate_size": 5120,
 
     "pretrain": True,
     "pretrain_name": "model_best.pt",
-    'lr': 1e-3,
+    'lr': 1e-4,
 
     # Set according to your CPU
-    "dataloader_workers": 1,
+    "dataloader_workers": 2,
     # Generate data online for train/val
     "online_train": True,
     "online_val": True,
