@@ -87,7 +87,7 @@ gt_noexp_config = {
 
     "pretrain": False,
     "pretrain_name": "model_best.pt",
-    'lr': 1e-3,
+    'lr': 1e-5,
 
     # Set according to your CPU
     "dataloader_workers": 2,

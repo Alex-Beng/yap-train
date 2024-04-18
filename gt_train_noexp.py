@@ -82,7 +82,8 @@ def train():
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
     # optimizer = optim.Adadelta(net.parameters())
-    optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
+    optimizer = optim.Adagrad(net.parameters(), lr=config['lr'])
+    # optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
 
     epoch = config["epoch"]
