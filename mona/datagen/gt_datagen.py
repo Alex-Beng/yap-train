@@ -5,6 +5,7 @@ import cv2
 import pickle
 from random import randint, choice, uniform
 from copy import deepcopy
+import torch
 
 # read all the map into memo for speed up
 
@@ -105,7 +106,7 @@ def gen_view_mask():
 
 
 
-def generate_image(expand2polar=False):
+def generate_image(expand2polar=False, cls_head=False):
     # return 224x224 image + [angle_norm1, angle_norm2]
     # in which angle_norm in [-1, 1]
     # angle_norm = (rad - pi) / pi, rad in [0 2pi]
@@ -196,6 +197,15 @@ def generate_image(expand2polar=False):
         label = np.array([mid_angle, angle]).astype(np.float32)
         res_img = res_img.astype(np.uint8)
         res_img = Image.fromarray(res_img)
+        return res_img, label
+    if cls_head:
+        # 把 mid_angle 离散到 0-359
+        mid_angle += 180
+        mid_angle = int(mid_angle) % 360
+        res_img = cropped_map.astype(np.uint8)
+        res_img = Image.fromarray(res_img)
+        label = torch.tensor(mid_angle)
+        # print(label)
         return res_img, label
 
     

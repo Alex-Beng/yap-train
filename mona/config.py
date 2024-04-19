@@ -54,10 +54,10 @@ gt_config = {
 
     "pretrain": True,
     "pretrain_name": "model_best.pt",
-    'lr': 1e-3,
+    'lr': 5e-4,
 
     # Set according to your CPU
-    "dataloader_workers": 2,
+    "dataloader_workers": 1,
     # Generate data online for train/val
     "online_train": True,
     "online_val": True,

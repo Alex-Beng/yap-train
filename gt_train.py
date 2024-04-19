@@ -32,7 +32,8 @@ def validate(net, validate_loader):
             y_hat = net(x)
             label = label.to(device)
             # calculate the L1 loss
-            loss = F.l1_loss(y_hat, label, reduction="mean")
+            loss = F.cross_entropy(y_hat, label, reduction="mean")
+            # loss = F.l1_loss(y_hat, label, reduction="mean")
             # loss = F.mse_loss(y_hat, label, reduction="mean")
             # print(f"Validation loss: {loss.item()}")
             total += loss.item()
@@ -44,7 +45,7 @@ def validate(net, validate_loader):
 
 
 def train():
-    net = Model_GT(3, hidden_channels=512, out_size=2).to(device)
+    net = Model_GT(3, depth=1, hidden_channels=1024, out_size=2, cls_head=True).to(device)
 
 
     if config["pretrain"]:
@@ -113,7 +114,12 @@ def train():
 
             y = net(x)
 
-            loss = F.l1_loss(y, target_vector, reduction="mean")
+            # 交叉熵 loss
+            criterion = torch.nn.CrossEntropyLoss()
+            # print(y.shape, target_vector.shape, target_vector)
+            loss = criterion(y, target_vector)
+
+            # loss = F.l1_loss(y, target_vector, reduction="mean")
             # loss = F.mse_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.reg_head.weight, p=1)
@@ -180,7 +186,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, label = generate_image(expand2polar=True)
+        im, label = generate_image(expand2polar=False, cls_head=True)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
 

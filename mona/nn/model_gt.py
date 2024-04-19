@@ -16,13 +16,13 @@ from mona.text import index_to_word, word_to_index
 
 
 class Model_GT(nn.Module):
-    def __init__(self, in_channels, depth=2, hidden_channels=192, num_heads=8, out_size=2):
+    def __init__(self, in_channels, depth=2, hidden_channels=192, num_heads=8, out_size=2, cls_head=False):
         super(Model_GT, self).__init__()
-        # self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
+        self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
 
         # cnn 切换为 resnet
-        resnet = torchvision.models.resnet18(pretrained=True)
-        self.cnn = nn.Sequential(*list(resnet.children())[:-2])
+        # resnet = torchvision.models.resnet18(pretrained=True)
+        # self.cnn = nn.Sequential(*list(resnet.children())[:-2])
 
 
         # use flatten, 7, 7 -> 49
@@ -54,6 +54,8 @@ class Model_GT(nn.Module):
         # TODO: 测试更多的回归头的方法
         # self.linear2 = nn.Linear(hidden_channels * 49, out_size)
         self.reg_head = nn.Linear(hidden_channels * 49, out_size)
+        self.cls_head = nn.Linear(hidden_channels * 49, 360)
+        self.use_cls_head = cls_head
 
     def forward(self, x):
         x = self.cnn(x)
@@ -69,7 +71,10 @@ class Model_GT(nn.Module):
         x = self.blocks(x)
         x = self.norm(x)
         x = x.flatten(1)
-        x = self.reg_head(x)
+        if self.use_cls_head:
+            x = self.cls_head(x)
+        else:
+            x = self.reg_head(x)
         # 无需更多的操作，相当于线性回归
 
         return x
