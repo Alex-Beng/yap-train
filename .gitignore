@@ -24,3 +24,4 @@ ttest.py
 /runs/
 /graph.*
 map_cache.pkl
+*.zip
