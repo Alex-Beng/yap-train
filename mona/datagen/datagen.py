@@ -305,7 +305,11 @@ def generate_pure_bg_image(rand_func=random_text):
             black2white[:, i] = white_thre
     # 以比例混合
     cv2.addWeighted(black2white, 0.2, res_img, 0.8, 0, res_img)
-
+    # 补偿亮度
+    refine_ratio = 1 / 0.8
+    refine_ratio = min(refine_ratio, 255 / np.max(res_img))
+    res_img = res_img.astype(np.float32) * refine_ratio
+    res_img = res_img.astype(np.uint8)
 
     min_count_val = random.randint(white_thre//2+100, 255)
     # min_count_val = white_thre//2+100
