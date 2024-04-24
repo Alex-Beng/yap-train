@@ -44,20 +44,53 @@ gt_config = {
     # 因为是正方形，所以只需要一个边长
     "side_len": 224,
     
-    "batch_size": 512, # 550 on 4GB gpu memo
+    "batch_size": 128,
     "epoch": 1000000,
     "print_per": 10,
-    "save_per": 100,
+    "save_per": 800,
 
     "train_size": 4096000,
-    "validate_size": 512000,
+    "validate_size": 5120,
 
-    "pretrain": False,
+    "pretrain": True,
     "pretrain_name": "model_best.pt",
-    'lr': 1e-3,
+    'lr': 5e-4,
 
     # Set according to your CPU
     "dataloader_workers": 1,
+    # Generate data online for train/val
+    "online_train": True,
+    "online_val": True,
+
+    # save acc 9999
+    "save_acc9999": True,
+
+    # backbone freeze
+    # 初始训练时冻结backbone，训练一段时间后解冻
+    "freeze_backbone": True,
+    "unfreeze_backbone_epoch": 1000,
+}
+
+gt_noexp_config = {
+    "device": "cuda",
+
+    # 因为是正方形，所以只需要一个边长
+    "side_len": 224,
+    
+    "batch_size": 128,
+    "epoch": 1000000,
+    "print_per": 10,
+    "save_per": 800,
+
+    "train_size": 4096000,
+    "validate_size": 5120,
+
+    "pretrain": False,
+    "pretrain_name": "model_best.pt",
+    'lr': 1e-5,
+
+    # Set according to your CPU
+    "dataloader_workers": 2,
     # Generate data online for train/val
     "online_train": True,
     "online_val": True,

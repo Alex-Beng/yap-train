@@ -6,6 +6,8 @@ import json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision
+from torchvision.models._utils import IntermediateLayerGetter
 
 from mona.nn.mobile_net_v3 import MobileNetV3Small_GT
 from mona.nn.svtr import MixingBlock, SVTRNet, PositionalEncoding, SubSample
@@ -14,14 +16,20 @@ from mona.text import index_to_word, word_to_index
 
 
 class Model_GT(nn.Module):
-    def __init__(self, in_channels, depth=2, hidden_channels=192, num_heads=8, out_size=2):
+    def __init__(self, in_channels, depth=2, hidden_channels=192, num_heads=8, out_size=2, cls_head=False):
         super(Model_GT, self).__init__()
         self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
+
+        # cnn 切换为 resnet
+        # resnet = torchvision.models.resnet18(pretrained=True)
+        # self.cnn = nn.Sequential(*list(resnet.children())[:-2])
+
+
         # use flatten, 7, 7 -> 49
         self.pe = PositionalEncoding(dim=hidden_channels, length=49) 
 
         # 添加一个batchnorm
-        # self.bm = nn.BatchNorm1d(24)
+        # self.bm = nn.BatchNorm1d(49)
         # 添加一个dropout
         self.dp = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
@@ -46,20 +54,27 @@ class Model_GT(nn.Module):
         # TODO: 测试更多的回归头的方法
         # self.linear2 = nn.Linear(hidden_channels * 49, out_size)
         self.reg_head = nn.Linear(hidden_channels * 49, out_size)
+        self.cls_head = nn.Linear(hidden_channels * 49, 360)
+        self.use_cls_head = cls_head
 
     def forward(self, x):
         x = self.cnn(x)
+        # print(x.shape)
+        # exit()
         x = x.flatten(2)
         x = x.permute((0, 2, 1))
         x = self.pe(x)
         # x = self.bm(x)
         x = self.dp(x)
         x = self.linear1(x)
-        x = self.dp(x)
+        # x = self.dp(x)
         x = self.blocks(x)
         x = self.norm(x)
         x = x.flatten(1)
-        x = self.reg_head(x)
+        if self.use_cls_head:
+            x = self.cls_head(x)
+        else:
+            x = self.reg_head(x)
         # 无需更多的操作，相当于线性回归
 
         return x
