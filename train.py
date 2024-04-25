@@ -20,6 +20,7 @@ from time import sleep
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 device = config["device"]
+val_cnt = 0
 
 # a list of target strings
 def get_target(s):
@@ -45,6 +46,7 @@ def get_target(s):
 
 
 def validate(net, validate_loader):
+    global val_cnt
     net.eval()
     correct = 0
     total = 0
@@ -61,7 +63,8 @@ def validate(net, validate_loader):
                 print(f'too many errors: {len(errs)}')
             total += len(label)
     net.train()
-    writer.add_scalar("Accuracy/Validation", correct / total)
+    writer.add_scalar("Accuracy/Validation", correct / total, val_cnt)
+    val_cnt += 1
     return correct / total
 
 
