@@ -105,8 +105,18 @@ def train():
                                        pk_genshin_ratio=config['data_genshin_ratio']) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
-    train_loader = DataLoader(train_dataset, shuffle=True, num_workers=config["dataloader_workers"], batch_size=config["batch_size"],)
-    validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
+    # 直接共用 loader，反正是生成数据
+    train_loader = DataLoader(
+            train_dataset, shuffle=True, 
+            num_workers=config["dataloader_workers"] , 
+            batch_size=config["batch_size"]
+            )
+    # validate_loader = train_loader
+    validate_loader = DataLoader(
+            validate_dataset, 
+            num_workers=config["dataloader_workers"], 
+            batch_size=config["batch_size"]
+            )
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
     # optimizer = optim.Adadelta(net.parameters())
