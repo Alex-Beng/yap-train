@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
+from torch.utils.tensorboard import writer
+
+writer = writer.SummaryWriter("yap_runs")
 
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
@@ -57,8 +60,8 @@ def validate(net, validate_loader):
             else:
                 print(f'too many errors: {len(errs)}')
             total += len(label)
-
     net.train()
+    writer.add_scalar("Accuracy/Validation", correct / total)
     return correct / total
 
 
@@ -119,8 +122,8 @@ def train():
             )
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
-    # optimizer = optim.Adadelta(net.parameters())
-    optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
+    optimizer = optim.Adadelta(net.parameters())
+    # optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
@@ -135,6 +138,7 @@ def train():
     for epoch in range(epoch):
         if config["freeze_backbone"] and epoch == config["unfreeze_backbone_epoch"]:
             net.unfreeze_backbone()
+        train_cnt = 0
         for x, label in train_loader:
             # sleep(10)
             optimizer.zero_grad()
@@ -153,6 +157,9 @@ def train():
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
+
+            writer.add_scalar("Loss/Train", loss.item(), train_cnt)
+            train_cnt += 1
             loss.backward()
             optimizer.step()
 
