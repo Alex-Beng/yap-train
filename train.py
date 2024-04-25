@@ -134,7 +134,9 @@ def train():
     print_per = config["print_per"]
     save_per = config["save_per"]
     batch = 0
-    curr_best_acc = -1
+    # 在 train 之前保留之前最好的，免得越来越差
+    curr_best_acc = validate(net, validate_loader)
+    torch.save(net.state_dict(), f"models/model_best.pt")
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
