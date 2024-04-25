@@ -136,6 +136,7 @@ def train():
     batch = 0
     # 在 train 之前保留之前最好的，免得越来越差
     curr_best_acc = validate(net, validate_loader)
+    print(f"curr best acc: {curr_best_acc}")
     torch.save(net.state_dict(), f"models/model_best.pt")
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
