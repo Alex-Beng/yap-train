@@ -25,3 +25,4 @@ ttest.py
 /graph.*
 map_cache.pkl
 *.zip
+yap_runs
