@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from torch.nn import functional as F
 from torch.utils.tensorboard import writer
 
-writer = writer.SummaryWriter()
+writer = writer.SummaryWriter("new_runs")
 
 from mona.datagen.gt_datagen import generate_image
 from mona.config import gt_config as config
