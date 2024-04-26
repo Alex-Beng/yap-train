@@ -25,7 +25,7 @@ config = {
     # "data_only_genshin": False,
     "data_only_genshin": True,
     # 生成混合数据时pickup的比例
-    "pickup_ratio": 0.9,
+    "pickup_ratio": 0.5,
     # pickup 中 genshin 真实数据的比例
     "data_genshin_ratio": 0.25,
     

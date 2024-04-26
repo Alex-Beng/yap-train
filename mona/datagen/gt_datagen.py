@@ -11,38 +11,44 @@ import torch
 
 # 基于 __file__ 的相对路径 ../map
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+MAP_CACHE_PATH = os.path.join(REPO_ROOT, 'map_cache.pkl')
 
+_init = False
 # check the Map cache exists or not
 # if not, read all the map, then save it to cache
-MAP_CACHE_PATH = os.path.join(REPO_ROOT, 'map_cache.pkl')
-if os.path.exists(MAP_CACHE_PATH):
-    with open(MAP_CACHE_PATH, 'rb') as f:
-        map_imgs = pickle.load(f)
-else:
-    MAP_PATH = os.path.join(REPO_ROOT, 'Map')
-    map_imgs = []
+def on_init():
+    global avatar_img, map_imgs
+    if _init:
+        return
 
-    if os.path.exists(MAP_PATH):
-        # list all *.png files
-        # and read them into map_imgs
-        for root, dirs, files in os.walk(MAP_PATH):
-            for file in files:
-                if file.endswith('.png'):
-                    img = Image.open(os.path.join(root, file))
-                    # make it openCV format, with alpha channel
-                    img = cv2.cvtColor(np.array(img), cv2.COLOR_RGBA2BGR)
-                    map_imgs.append(img)
-        # save to cache
-        with open(MAP_CACHE_PATH, 'wb') as f:
-            pickle.dump(map_imgs, f)
+    if os.path.exists(MAP_CACHE_PATH):
+        with open(MAP_CACHE_PATH, 'rb') as f:
+            map_imgs = pickle.load(f)
     else:
-        raise FileNotFoundError('Map folder not found')
-print('Map loaded:', len(map_imgs))
+        MAP_PATH = os.path.join(REPO_ROOT, 'Map')
+        map_imgs = []
 
-# read the avatar image
-avatar_img = Image.open(os.path.join(REPO_ROOT, 'Avatar.png'))
-# convert to openCV format, with alpha channel
-avatar_img = cv2.cvtColor(np.array(avatar_img), cv2.COLOR_RGBA2BGRA)
+        if os.path.exists(MAP_PATH):
+            # list all *.png files
+            # and read them into map_imgs
+            for root, dirs, files in os.walk(MAP_PATH):
+                for file in files:
+                    if file.endswith('.png'):
+                        img = Image.open(os.path.join(root, file))
+                        # make it openCV format, with alpha channel
+                        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGBA2BGR)
+                        map_imgs.append(img)
+            # save to cache
+            with open(MAP_CACHE_PATH, 'wb') as f:
+                pickle.dump(map_imgs, f)
+        else:
+            raise FileNotFoundError('Map folder not found')
+    print('Map loaded:', len(map_imgs))
+
+    # read the avatar image
+    avatar_img = Image.open(os.path.join(REPO_ROOT, 'Avatar.png'))
+    # convert to openCV format, with alpha channel
+    avatar_img = cv2.cvtColor(np.array(avatar_img), cv2.COLOR_RGBA2BGRA)
 
 
 def gen_view_mask():
@@ -89,6 +95,7 @@ def gen_view_mask():
     # print(new_image.shape)
 
     # cv2.imshow('polar',new_image)
+    # cv2.imshow('polar',new_image)
 
     h,w = new_image.shape
 
@@ -119,6 +126,10 @@ def generate_image(expand2polar=False, cls_head=False):
         5. "paste" the avatar to the image
         6. add weight with the view mask
     '''
+    global _init
+    if not _init:
+        on_init()
+        _init = True
 
     rd_map = choice(map_imgs)
 
@@ -220,8 +231,8 @@ def generate_image(expand2polar=False, cls_head=False):
     # print(cropped_map.shape)
     res_img = cropped_map.astype(np.uint8)
     # res_img = cv2.cvtColor(cropped_map.astype(np.uint8), cv2.COLOR_BGR2GRAY)
-    # cv2.imshow('res_img', res_img)
-    # cv2.waitKey(0)
+    # # cv2.imshow('res_img', res_img)
+    # # cv2.waitKey(0)
     res_img = Image.fromarray(res_img)
     # label = np.array([mid_angle, angle])
     return res_img, label

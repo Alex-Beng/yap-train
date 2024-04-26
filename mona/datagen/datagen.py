@@ -1,6 +1,11 @@
 import random
 import os
+import json
+import pickle
 
+import cv2
+from PIL import Image
+import lzma
 from PIL import Image, ImageFont, ImageDraw
 import numpy as np
 
@@ -35,6 +40,7 @@ from mona.datagen.pre_process import pre_process
 # 4k分辨率最大对应84号字，900p分辨率最小对应18号字
 # Yap需要固定字号
 fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(85, 104)]
+_init = False
 
 def load_bg_imgs():
     path = "../yap/dumps_full_mona2/"
@@ -305,7 +311,11 @@ def generate_pure_bg_image(rand_func=random_text):
             black2white[:, i] = white_thre
     # 以比例混合
     cv2.addWeighted(black2white, 0.2, res_img, 0.8, 0, res_img)
-
+    # 补偿亮度
+    refine_ratio = 1 / 0.8
+    refine_ratio = min(refine_ratio, 255 / np.max(res_img))
+    res_img = res_img.astype(np.float32) * refine_ratio
+    res_img = res_img.astype(np.uint8)
 
     min_count_val = random.randint(white_thre//2+100, 255)
     # min_count_val = white_thre//2+100
@@ -324,16 +334,17 @@ def generate_pure_bg_image(rand_func=random_text):
     max_pixel = res_img.max()
     max_ratio = 255 / max_pixel
     res_img = res_img * random.uniform(0.7, max_ratio)
+
+    # 0.5 概率反色
+    if random.random() < 0.5:
+        res_img = 255 - res_img
+
     res_img = res_img.astype(np.uint8)
 
     res_img = Image.fromarray(res_img)
     return res_img, text
 
-import lzma
-import pickle
-import cv2
-import json
-from PIL import Image
+
 
 def js_dp(obj, path):
     json.dump(obj, open(path, 'w', encoding='utf-8'), ensure_ascii=False)
@@ -341,26 +352,28 @@ def js_dp(obj, path):
 def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
-# 使用pickle读入预先存放的arrays，省去随机读取的时间
-# TODO: remove this tryd
-try:
-    genshin_x_imgs = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
-    genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
-except:
-    backup_path = "D:/"
-    backup_x_path = os.path.join(backup_path, 'genshin_x_imgs.pkl')
-    backup_y_path = os.path.join(backup_path, 'genshin_y.pkl')
-    if os.path.exists(backup_x_path) and os.path.exists(backup_y_path):
-        genshin_x_imgs = pickle.load(lzma.open(backup_x_path, 'rb'))
-        genshin_y = pickle.load(lzma.open(backup_y_path, 'rb'))
-    else:
-        genshin_x_imgs = []
-        genshin_y = []
+def on_init():
+    global genshin_x_imgs, genshin_y, genshin_n, bg_imgs
+    # 使用pickle读入预先存放的arrays，省去随机读取的时间
+    # TODO: remove this tryd
+    try:
+        genshin_x_imgs = pickle.load(lzma.open('/media/alex/Data/genshin_x_imgs.pkl', 'rb'))
+        genshin_y = pickle.load(lzma.open('/media/alex/Data/genshin_y.pkl', 'rb'))
+    except:
+        backup_path = "D:/"
+        backup_x_path = os.path.join(backup_path, 'genshin_x_imgs.pkl')
+        backup_y_path = os.path.join(backup_path, 'genshin_y.pkl')
+        if os.path.exists(backup_x_path) and os.path.exists(backup_y_path):
+            genshin_x_imgs = pickle.load(lzma.open(backup_x_path, 'rb'))
+            genshin_y = pickle.load(lzma.open(backup_y_path, 'rb'))
+        else:
+            genshin_x_imgs = []
+            genshin_y = []
 
 
-assert(len(genshin_x_imgs) == len(genshin_y))
-genshin_n = len(genshin_y)
-bg_imgs = load_bg_imgs()
+    assert(len(genshin_x_imgs) == len(genshin_y))
+    genshin_n = len(genshin_y)
+    bg_imgs = load_bg_imgs()
 
 '''
 genshin_x = js_ld('../yap/xx.json')
@@ -395,6 +408,10 @@ for i in range(genshin_n):
 '''
 
 def generate_pickup_image(rand_func=random_text, ratio=0.5):
+    global _init
+    if not _init:
+        on_init()
+        _init = True
 
     # 一半真实数据，一半生成数据
     # 真实数据仅用空白数据
@@ -555,6 +572,10 @@ def generate_ui_image():
 
 # mix pickup and ui
 def generate_mix_image(pickup_rand_func=random_text, pickup_genshin_ratio=0.5, pickup_ratio=0.5):
+    global _init
+    if not _init:
+        on_init()
+        _init = True
     if random.random() < pickup_ratio:
         return generate_pickup_image(pickup_rand_func, pickup_genshin_ratio)
     else:

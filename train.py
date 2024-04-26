@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
+from torch.utils.tensorboard import writer
+
+writer = writer.SummaryWriter("yap_runs")
 
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
@@ -17,6 +20,7 @@ from time import sleep
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
 device = config["device"]
+val_cnt = 0
 
 # a list of target strings
 def get_target(s):
@@ -42,6 +46,7 @@ def get_target(s):
 
 
 def validate(net, validate_loader):
+    global val_cnt
     net.eval()
     correct = 0
     total = 0
@@ -57,8 +62,9 @@ def validate(net, validate_loader):
             else:
                 print(f'too many errors: {len(errs)}')
             total += len(label)
-
     net.train()
+    writer.add_scalar("Accuracy/Validation", correct / total, val_cnt)
+    val_cnt += 1
     return correct / total
 
 
@@ -105,12 +111,22 @@ def train():
                                        pk_genshin_ratio=config['data_genshin_ratio']) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
-    train_loader = DataLoader(train_dataset, shuffle=True, num_workers=config["dataloader_workers"], batch_size=config["batch_size"],)
-    validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
+    # 直接共用 loader，反正是生成数据
+    train_loader = DataLoader(
+            train_dataset, shuffle=True, 
+            num_workers=config["dataloader_workers"] , 
+            batch_size=config["batch_size"]
+            )
+    # validate_loader = train_loader
+    validate_loader = DataLoader(
+            validate_dataset, 
+            num_workers=config["dataloader_workers"], 
+            batch_size=config["batch_size"]
+            )
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
-    # optimizer = optim.Adadelta(net.parameters())
-    optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
+    optimizer = optim.Adadelta(net.parameters())
+    # optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
@@ -118,13 +134,17 @@ def train():
     print_per = config["print_per"]
     save_per = config["save_per"]
     batch = 0
-    curr_best_acc = -1
+    # 在 train 之前保留之前最好的，免得越来越差
+    curr_best_acc = validate(net, validate_loader)
+    print(f"curr best acc: {curr_best_acc}")
+    torch.save(net.state_dict(), f"models/model_best.pt")
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
     for epoch in range(epoch):
         if config["freeze_backbone"] and epoch == config["unfreeze_backbone_epoch"]:
             net.unfreeze_backbone()
+        train_cnt = 0
         for x, label in train_loader:
             # sleep(10)
             optimizer.zero_grad()
@@ -143,6 +163,9 @@ def train():
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
+
+            writer.add_scalar("Loss/Train", loss.item(), train_cnt)
+            train_cnt += 1
             loss.backward()
             optimizer.step()
 
