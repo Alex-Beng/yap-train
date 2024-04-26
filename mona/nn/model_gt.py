@@ -16,13 +16,13 @@ from mona.text import index_to_word, word_to_index
 
 
 class Model_GT(nn.Module):
-    def __init__(self, in_channels, depth=2, hidden_channels=192, num_heads=8, out_size=2, cls_head=False):
+    def __init__(self, in_channels, depth=0, hidden_channels=192, num_heads=8, out_size=2, cls_head=False):
         super(Model_GT, self).__init__()
-        self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
+        # self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
 
         # cnn 切换为 resnet
-        # resnet = torchvision.models.resnet18(pretrained=True)
-        # self.cnn = nn.Sequential(*list(resnet.children())[:-2])
+        resnet = torchvision.models.resnet18(pretrained=True)
+        self.cnn = nn.Sequential(*list(resnet.children())[:-2])
 
 
         # use flatten, 7, 7 -> 49
@@ -32,6 +32,8 @@ class Model_GT(nn.Module):
         # self.bm = nn.BatchNorm1d(49)
         # 添加一个dropout
         self.dp = nn.Dropout(0.1)
+        self.dp2 = nn.Dropout(0.1)
+        self.dp3 = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
         self.blocks = nn.Sequential()
         for i in range(depth):
@@ -67,10 +69,12 @@ class Model_GT(nn.Module):
         # x = self.bm(x)
         x = self.dp(x)
         x = self.linear1(x)
-        # x = self.dp(x)
+        x = self.dp2(x)
+        x = self.dp3(x)
         x = self.blocks(x)
         x = self.norm(x)
         x = x.flatten(1)
+
         if self.use_cls_head:
             x = self.cls_head(x)
         else:
