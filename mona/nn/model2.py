@@ -170,3 +170,16 @@ class Model2(nn.Module):
     def unfreeze_backbone(self):
         for param in self.cnn.parameters():
             param.requires_grad = True
+    
+    def freeze_withouth_backbone(self):
+        for name, param in self.named_parameters():
+            param.requires_grad = False
+            if "cnn" in name:
+                param.requires_grad = True
+    
+    def unfreeze_withouth_backbone(self):
+        for name, param in self.named_parameters():
+            param.requires_grad = True
+            if "cnn" in name:
+                param.requires_grad = True
+        

@@ -36,6 +36,10 @@ config = {
     # 初始训练时冻结backbone，训练一段时间后解冻
     "freeze_backbone": True,
     "unfreeze_backbone_epoch": 1000,
+
+    # 倒反天罡，冻结其他层，训练cnn
+    "freeze_withouth_backbone": False,
+    "unfreeze_withouth_backbone_epoch": 1000,
 }
 
 gt_config = {

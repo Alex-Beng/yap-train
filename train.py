@@ -141,9 +141,14 @@ def train():
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
+    if config['freeze_withouth_backbone']:
+        net.freeze_withouth_backbone()
     for epoch in range(epoch):
         if config["freeze_backbone"] and epoch == config["unfreeze_backbone_epoch"]:
             net.unfreeze_backbone()
+        if config['freeze_withouth_backbone'] and epoch == config["unfreeze_withouth_backbone_epoch"]:
+            net.unfreeze_withouth_backbone()
+
         train_cnt = 0
         for x, label in train_loader:
             # sleep(10)
