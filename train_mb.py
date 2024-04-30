@@ -5,15 +5,15 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 from torch.utils.tensorboard import writer
 
-writer = writer.SummaryWriter("yap_runs")
+writer = writer.SummaryWriter("yap_runs/no_pe")
 
 from mona.text import index_to_word, word_to_index
 from mona.nn.model import Model
 from mona.nn.svtr import SVTRNet
 from mona.datagen.datagen import generate_pure_bg_image, generate_pickup_image, random_text, random_text_genshin_distribute, generate_mix_image
-from mona.config import config
+from mona.config import mb_config as config
 from mona.nn import predict as predict_net
-from mona.nn.model2 import Model2
+from mona.nn.model2_mb import Model2
 
 import datetime
 from time import sleep
@@ -137,7 +137,7 @@ def train():
     # 在 train 之前保留之前最好的，免得越来越差
     curr_best_acc = validate(net, validate_loader)
     print(f"curr best acc: {curr_best_acc}")
-    torch.save(net.state_dict(), f"models/model_best.pt")
+    torch.save(net.state_dict(), f"models/model_best_mb.pt")
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
@@ -164,7 +164,7 @@ def train():
 
             y = net(x)
 
-            input_lengths = torch.full((batch_size,), 48, device=device, dtype=torch.long)
+            input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
@@ -187,14 +187,14 @@ def train():
                 print("Validating and checkpointing")
                 rate = validate(net, validate_loader)
                 print(f"{cur_time} rate: {rate * 100}%")
-                torch.save(net.state_dict(), f"models/model_training.pt")
+                torch.save(net.state_dict(), f"models/model_training_mb.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if rate == 1:
-                    torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}.pt")
+                    torch.save(net.state_dict(), f"models/model_acc100-epoch{epoch}_mb.pt")
                 if int(rate*10000) >= 9999 and config["save_acc9999"]:
-                    torch.save(net.state_dict(), f"models/model_acc9999-epoch{epoch}.pt")
+                    torch.save(net.state_dict(), f"models/model_acc9999-epoch{epoch}_mb.pt")
                 if rate > curr_best_acc:
-                    torch.save(net.state_dict(), f"models/model_best.pt")
+                    torch.save(net.state_dict(), f"models/model_best_.pt")
                     curr_best_acc = rate
 
             batch += 1
@@ -275,3 +275,6 @@ class MyOnlineDataSet(Dataset):
         text = text.strip()
 
         return im, text
+
+if __name__ == "__main__":
+    train()

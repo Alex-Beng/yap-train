@@ -79,18 +79,17 @@ from mona.text import index_to_word, word_to_index
 class Model2(nn.Module):
     def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=512, num_heads=8):
         super(Model2, self).__init__()
-        # self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
-        self.pe = PositionalEncoding(dim=256, length=48)
+        self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
+        self.pe = PositionalEncoding(dim=hidden_channels, length=24)
         
-        resnet = torchvision.models.resnet18(pretrained=True)
-        resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-        resnet.avgpool = nn.AdaptiveAvgPool2d((7, 7))
+        # resnet = torchvision.models.resnet18(pretrained=True)
+        # resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        # resnet.avgpool = nn.AdaptiveAvgPool2d((7, 7))
 
-        self.cnn = nn.Sequential(*list(resnet.children())[:-3])
+        # self.cnn = nn.Sequential(*list(resnet.children())[:-3])
 
-        hidden_channels = 256
         # 添加一个batchnorm
-        self.bm = nn.BatchNorm1d(48)
+        # self.bm = nn.BatchNorm1d(24)
         # 添加一个dropout
         self.dp = nn.Dropout(0.2)
         self.dp2 = nn.Dropout(0.1)
@@ -103,7 +102,7 @@ class Model2(nn.Module):
                 is_local=False,
                 drop_path=0.0,
                 hw=None,
-                input_length=48,
+                input_length=24,
                 mlp_ratio=2,
                 attention_drop=0.1,
                 drop=0.1,
