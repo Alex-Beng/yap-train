@@ -84,18 +84,20 @@ def gen_view_mask():
     # new_image[v_beg:v_beg+v_angle, :] = 255
     if v_beg + v_angle < 360:
         new_image[v_beg:v_beg+v_angle, :] = 255
+        # 添加从左到右的渐变
+        for i in range(v_beg, v_beg+v_angle):
+            for j in range(radius):
+                new_image[i, j] = 255 * (1 - j / radius)
     else:
         new_image[v_beg:, :] = 255
         new_image[:v_beg+v_angle-360, :] = 255
 
-    # 添加从左到右的渐变
-    # 添加一个阴影比例，随机增亮或变暗
-    shadow_ratio = uniform(0.9, 1.1)
-    # from v_beg -> v_beg+v_angle; 0 -> radius
-    for i in range(v_beg, v_beg+v_angle):
-        for j in range(radius):
-            new_image[i, j] = 255 * (1 - j / radius)
-    
+        for i in range(v_beg, 360):
+            for j in range(radius):
+                new_image[i, j] = 255 * (1 - j / radius)
+        for i in range(0, v_beg+v_angle-360):
+            for j in range(radius):
+                new_image[i, j] = 255 * (1 - j / radius)    
 
     new_image[: ,w2-w:w2] = flipped
     # new_image = ~new_image
