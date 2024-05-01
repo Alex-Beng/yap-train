@@ -31,7 +31,7 @@ class Model_GT(nn.Module):
         # 添加一个batchnorm
         # self.bm = nn.BatchNorm1d(49)
         # 添加一个dropout
-        self.dp = nn.Dropout(0.1)
+        self.dp = nn.Dropout(0.2)
         self.dp2 = nn.Dropout(0.1)
         self.dp3 = nn.Dropout(0.1)
         self.linear1 = nn.Linear(hidden_channels, hidden_channels)
@@ -65,7 +65,7 @@ class Model_GT(nn.Module):
         # exit()
         x = x.flatten(2)
         x = x.permute((0, 2, 1))
-        x = self.pe(x)
+        # x = self.pe(x)
         # x = self.bm(x)
         x = self.dp(x)
         x = self.linear1(x)
