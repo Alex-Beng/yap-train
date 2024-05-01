@@ -56,7 +56,7 @@ mb_config = {
     "validate_size": 12800,
 
     "pretrain": True,
-    "pretrain_name": "model_best_origin_model.pt",
+    "pretrain_name": "model_best_.pt",
     'lr': 1e-5,
 
     # Set according to your CPU
