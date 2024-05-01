@@ -65,7 +65,7 @@ def gen_view_mask():
     h2,w2 = new_image.shape
 
     v_angle = randint(70, 90)
-    v_beg = randint(0, 360 - v_angle)
+    v_beg = randint(0, 360)
     '''
     0->90    90->180    +90
     90->180  -180->-90  -270
@@ -76,11 +76,18 @@ def gen_view_mask():
 
     # calculate the mid view angle
     mid_angle = v_beg + v_angle // 2
+    mid_angle = mid_angle % 360
     # transform the angle origin point
     mid_angle = mid_angle + 90 if 0 <= mid_angle < 90 else mid_angle - 270
     
     # set the new_image
-    new_image[v_beg:v_beg+v_angle, :] = 255
+    # new_image[v_beg:v_beg+v_angle, :] = 255
+    if v_beg + v_angle < 360:
+        new_image[v_beg:v_beg+v_angle, :] = 255
+    else:
+        new_image[v_beg:, :] = 255
+        new_image[:v_beg+v_angle-360, :] = 255
+
     # 添加从左到右的渐变
     # 添加一个阴影比例，随机增亮或变暗
     shadow_ratio = uniform(0.9, 1.1)
