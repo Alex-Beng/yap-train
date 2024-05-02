@@ -45,7 +45,7 @@ def validate(net, validate_loader):
 
 
 def train():
-    net = Model_GT(3, depth=4, hidden_channels=512, out_size=2, cls_head=True).to(device)
+    net = Model_GT(3, depth=2, hidden_channels=512, out_size=4, cls_head=True).to(device)
 
 
     if config["pretrain"]:
@@ -82,8 +82,8 @@ def train():
     validate_loader = DataLoader(validate_dataset, num_workers=config["dataloader_workers"], batch_size=config["batch_size"])
 
     # optimizer = optim.SGD(net.parameters(), lr=0.1)
-    optimizer = optim.Adadelta(net.parameters())
-    # optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
+    # optimizer = optim.Adadelta(net.parameters())
+    optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     # optimizer = optim.RMSprop(net.parameters())
 
     epoch = config["epoch"]
