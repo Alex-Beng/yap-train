@@ -100,11 +100,11 @@ if __name__ == "__main__":
                         im.save(f"samples/err-sample-id{total+i}.png")
                         # save to the training folder
                         
-                        if not os.path.exists(f"another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}"):
-                            os.makedirs(f"another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}")
-                        
-                        if save_err:
-                            im.save(f'another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}/{total+i}_{pred}_{truth}.jpg')
+                    if not os.path.exists(f"another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}"):
+                        os.makedirs(f"another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}")
+                    
+                    if save_err:
+                        im.save(f'another_training/{model_file_name}_{yy_mm_dd_hh_mm_ss}/{total+i}_{pred}_{truth}.jpg')
 
             # Stats
             err += sum([0 if predict[i] == label[i] or ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")
