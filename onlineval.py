@@ -93,9 +93,9 @@ if __name__ == "__main__":
                 if pred != truth and not ( truth[:7] == "尚需生长时间：" and pred[:7] == "尚需生长时间："):
                     print(f"\033[2K\r==== pred: {pred}, truth: {truth} ====")
                     # Save the incorrect samples
+                    arr = x.to('cpu')[i].squeeze()
+                    im = Image.fromarray(np.uint8(arr * 255))
                     if err < max_plot_incorrect_sample:
-                        arr = x.to('cpu')[i].squeeze()
-                        im = Image.fromarray(np.uint8(arr * 255))
                         # im.show()
                         im.save(f"samples/err-sample-id{total+i}.png")
                         # save to the training folder
