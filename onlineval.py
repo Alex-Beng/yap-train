@@ -12,7 +12,7 @@ from mona.nn.model import Model
 # from mona.nn.model2 import Model2
 from mona.nn.model2_mb import Model2
 from mona.datagen.datagen import generate_pure_bg_image, generate_pickup_image, random_text, random_text_genshin_distribute, generate_mix_image
-from mona.config import config
+from mona.config import mb_config as config
 from mona.nn import predict as predict_net
 
 import numpy as np
@@ -36,7 +36,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # im, text = generate_pickup_image(random_text_genshin_distribute)
-        im, text = generate_mix_image(random_text_genshin_distribute, pickup_ratio=1)
+        im, text = generate_mix_image(random_text_genshin_distribute, config['data_genshin_ratios'], config['pickup_ratio'])
         tensor = transforms.ToTensor()(im)
         text = text.strip()
         return tensor, text
