@@ -34,7 +34,7 @@ class Model_GT(nn.Module):
         self.dp = nn.Dropout(0.2)
         self.dp2 = nn.Dropout(0.1)
         self.dp3 = nn.Dropout(0.1)
-        self.linear1 = nn.Linear(hidden_channels, hidden_channels)
+        # self.linear1 = nn.Linear(hidden_channels, hidden_channels)
         self.blocks = nn.Sequential()
         for i in range(depth):
             block = MixingBlock(
@@ -68,9 +68,9 @@ class Model_GT(nn.Module):
         # x = self.pe(x)
         # x = self.bm(x)
         x = self.dp(x)
-        x = self.linear1(x)
-        x = self.dp2(x)
-        x = self.dp3(x)
+        # x = self.linear1(x)
+        # x = self.dp2(x)
+        # x = self.dp3(x)
         x = self.blocks(x)
         x = self.norm(x)
         x = x.flatten(1)
