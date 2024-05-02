@@ -20,7 +20,7 @@ if __name__ == "__main__":
         train_size = config["train_size"]
         validate_size = config["validate_size"]
         pk_ratio = config["pickup_ratio"]
-        data_genshin_ratio = config["data_genshin_ratio"]
+        data_genshin_ratio = config["data_genshin_ratios"]
 
         folder = pathlib.Path("data")
         if not folder.is_dir():

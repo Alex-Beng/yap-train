@@ -26,8 +26,8 @@ config = {
     "data_only_genshin": True,
     # 生成混合数据时pickup的比例
     "pickup_ratio": 0.75,
-    # pickup 中 genshin 真实数据的比例
-    "data_genshin_ratio": 0.3,
+    # pickup 中 genshin 真实数据的比例，以及 validate 中错误的 another 数据比例
+    "data_genshin_ratios": [0.3, 0.1],
     
     # save acc 9999
     "save_acc9999": True,
@@ -55,7 +55,7 @@ mb_config = {
     "train_size": 40960,
     "validate_size": 25600,
 
-    "pretrain": True,
+    "pretrain": False,
     "pretrain_name": "model_best_.pt",
     'lr': 1e-6,
 
@@ -70,8 +70,8 @@ mb_config = {
     "data_only_genshin": True,
     # 生成混合数据时pickup的比例
     "pickup_ratio": 0.75,
-    # pickup 中 genshin 真实数据的比例
-    "data_genshin_ratio": 0.3,
+    # pickup 中 genshin 真实数据的比例，以及 validate 中错误的 another 数据比例
+    "data_genshin_ratios": [0.3, 0.1],
     
     # save acc 9999
     "save_acc9999": False,

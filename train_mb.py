@@ -104,11 +104,11 @@ def train():
     only_genshin = config['data_only_genshin']
     train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
                                     pk_ratio=config["pickup_ratio"],
-                                     pk_genshin_ratio=config['data_genshin_ratio']) if config["online_train"] else MyDataSet(
+                                     pk_genshin_ratio=config['data_genshin_ratios']) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
     validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=True, 
                                        pk_ratio=config["pickup_ratio"],
-                                       pk_genshin_ratio=config['data_genshin_ratio']) if config["online_val"] else MyDataSet(
+                                       pk_genshin_ratio=config['data_genshin_ratios']) if config["online_val"] else MyDataSet(
         torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
     # 直接共用 loader，反正是生成数据
