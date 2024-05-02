@@ -26,11 +26,18 @@ def validate(net, validate_loader):
     net.eval()
     total = 0
     cnt = 0
+    acc = 0
     with torch.no_grad():
         for x, label in validate_loader:
             x = x.to(device)
-            y_hat = net(x)
             label = label.to(device)
+            y_hat = net(x)
+
+            _, predict = torch.max(y_hat, 1)
+            correct = (predict == label).sum().item()
+            label = label.to(device)
+            acc += (correct / label.size(0))
+
             # calculate the L1 loss
             loss = F.cross_entropy(y_hat, label, reduction="mean")
             # loss = F.l1_loss(y_hat, label, reduction="mean")
@@ -39,9 +46,10 @@ def validate(net, validate_loader):
             total += loss.item()
             cnt += 1
     net.train()
+    writer.add_scalar("Acc/Validation", acc / cnt, vali_cnt)
     writer.add_scalar("Loss/Validation", total / cnt, vali_cnt)
     vali_cnt += 1
-    return total / cnt
+    return total / cnt, acc / cnt
 
 
 def train():
@@ -93,6 +101,7 @@ def train():
     # 回归任务也只能用loss而不是acc了吧？
     # 是不是1°之内就可以认为分类成功？
     curr_best_loss = float("inf")
+    curr_best_acc = 0
     start_time = datetime.datetime.now()
     if config["freeze_backbone"]:
         net.freeze_backbone()
@@ -138,15 +147,16 @@ def train():
                 # sleep(5)
 
             if batch % save_per == 0 and batch != 0:
-                print(f"curr best loss: {curr_best_loss}")
+                print(f"curr best loss: {curr_best_loss}, curr best acc: {curr_best_acc}")
                 print("Validating and checkpointing")
-                val_loss = validate(net, validate_loader)
-                print(f"{cur_time} loss: {val_loss}")
+                val_loss, val_acc = validate(net, validate_loader)
+                print(f"{cur_time} loss: {val_loss}", f"acc: {val_acc}")
                 torch.save(net.state_dict(), f"models/gt/model_training.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
-                if val_loss < curr_best_loss:
+                if val_acc > curr_best_acc:
                     torch.save(net.state_dict(), f"models/gt/model_best.pt")
                     curr_best_loss = val_loss
+                    curr_best_acc = val_acc
 
             batch += 1
 
