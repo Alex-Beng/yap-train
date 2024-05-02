@@ -52,12 +52,12 @@ mb_config = {
     "print_per": 10,
     "save_per": 400,
 
-    "train_size": 4096000,
-    "validate_size": 12800,
+    "train_size": 40960,
+    "validate_size": 25600,
 
     "pretrain": True,
     "pretrain_name": "model_best_.pt",
-    'lr': 1e-5,
+    'lr': 1e-6,
 
     # Set according to your CPU
     "dataloader_workers": 1,
@@ -74,7 +74,7 @@ mb_config = {
     "data_genshin_ratio": 0.3,
     
     # save acc 9999
-    "save_acc9999": True,
+    "save_acc9999": False,
 
     # backbone freeze
     # 初始训练时冻结backbone，训练一段时间后解冻

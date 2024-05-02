@@ -43,7 +43,7 @@ fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(85, 104)]
 _init = False
 
 def load_bg_imgs():
-    path = "../yap/dumps_full_mona2/"
+    path = "./dumps_full_mona2/"
     # check path exists
     if not os.path.exists(path):
         return []
