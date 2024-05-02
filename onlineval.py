@@ -60,7 +60,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     model_file_path = args.model_file
-    model_file_name = model_file_path.split("/")[-1]
+    model_file_path = model_file_path.replace("\\", "/")
+    model_file_name = model_file_path.split("/")[-1].split(".")[0]
 
     print(f"Validating {model_file_path}")
     net.load_state_dict(torch.load(
