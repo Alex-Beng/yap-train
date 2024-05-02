@@ -353,7 +353,9 @@ def js_ld(path):
     return json.load(open(path, 'r', encoding='utf-8'))
 
 def on_init():
-    global genshin_x_imgs, genshin_y, genshin_n, bg_imgs
+    global genshin_x_imgs, genshin_y, genshin_n
+    global another_x_imgs, another_y, another_n
+    global bg_imgs
     # 使用pickle读入预先存放的arrays，省去随机读取的时间
     # TODO: remove this tryd
     try:
@@ -369,10 +371,26 @@ def on_init():
         else:
             genshin_x_imgs = []
             genshin_y = []
+    
+    try:
+        another_x_imgs = pickle.load(lzma.open('/media/alex/Data/another_x_imgs.pkl', 'rb'))
+        another_y = pickle.load(lzma.open('/media/alex/Data/another_y.pkl', 'rb'))
+    except:
+        backup_path = "D:/"
+        backup_x_path = os.path.join(backup_path, 'another_x_imgs.pkl')
+        backup_y_path = os.path.join(backup_path, 'another_y.pkl')
+        if os.path.exists(backup_x_path) and os.path.exists(backup_y_path):
+            another_x_imgs = pickle.load(lzma.open(backup_x_path, 'rb'))
+            another_y = pickle.load(lzma.open(backup_y_path, 'rb'))
+        else:
+            another_x_imgs = []
+            another_y = []
 
 
     assert(len(genshin_x_imgs) == len(genshin_y))
     genshin_n = len(genshin_y)
+    assert(len(another_x_imgs) == len(another_y))
+    another_n = len(another_y) 
     bg_imgs = load_bg_imgs()
 
 '''
@@ -407,60 +425,30 @@ for i in range(genshin_n):
         genshin_x_imgs.append(img)
 '''
 
-def generate_pickup_image(rand_func=random_text, ratio=0.5):
+def generate_pickup_image(rand_func=random_text, ratios: list[int, int] = [0.33, 0.33]):
     global _init
     if not _init:
         on_init()
         _init = True
-
-    # 一半真实数据，一半生成数据
-    # 真实数据仅用空白数据
-    if random.random() < ratio:
+    assert len(ratios) == 2
+    assert sum(ratios) < 1
+    
+    # 三部分数据，
+    # 手工标注的 genshin， validate 中错误的 another，生成数据
+    if random.random() < ratios[0]:
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
-        # while not text_all_in_lexicon(text):
-        #     print(f"[warning] {text} not in lexicon")
-        #     idx = random.randint(0, genshin_n - 1)
-        #     text = genshin_y[idx]
-
-        # path = os.path.join(root_path, genshin_x[idx])
-        
         img = genshin_x_imgs[idx]
-        # img = Image.open(path)
-        # img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-        # img = cv2.resize(img, (221, 32))
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)[1]
         img = Image.fromarray(img)
         return img, text
-        
+    elif random.random() < ratios[0] + ratios[1]:
+        idx = random.randint(0, another_n - 1)
+        text = another_y[idx]
+        img = another_x_imgs[idx]
 
-        # if text == '':
-        #     img_way = random.randint(1, 5)
-        #     if img_way == 1:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=0)
-        #     elif img_way == 2:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=255)
-        #     elif img_way == 3:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_DEFAULT, value=0)
-        #     elif img_way == 4:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_REFLECT, value=0)
-        #     elif img_way == 5:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_REPLICATE, value=0)    
-            
-        #     img = Image.fromarray(img)
-        #     return img, text
-        # else:
-        #     img_way = random.randint(1, 2)
-        #     if img_way == 1:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=0)
-        #     elif img_way == 2:
-        #         img = cv2.copyMakeBorder(img, 0,0,0,384-221, cv2.BORDER_CONSTANT, value=255)
-            
-        #     img = Image.fromarray(img)
-        #     return img, text
-        
+        img = Image.fromarray(img)
+        return img, text
     else:
         return generate_pure_bg_image(rand_func)
 
@@ -571,13 +559,13 @@ def generate_ui_image():
 
 
 # mix pickup and ui
-def generate_mix_image(pickup_rand_func=random_text, pickup_genshin_ratio=0.5, pickup_ratio=0.5):
+def generate_mix_image(pickup_rand_func=random_text, pickup_gaa_ratios: list[int, int]=[0.33,0.33], pickup_ratio=0.5):
     global _init
     if not _init:
         on_init()
         _init = True
     if random.random() < pickup_ratio:
-        return generate_pickup_image(pickup_rand_func, pickup_genshin_ratio)
+        return generate_pickup_image(pickup_rand_func, pickup_gaa_ratios)
     else:
         return generate_ui_image()
 
