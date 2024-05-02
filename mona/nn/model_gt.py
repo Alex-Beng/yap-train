@@ -18,11 +18,11 @@ from mona.text import index_to_word, word_to_index
 class Model_GT(nn.Module):
     def __init__(self, in_channels, depth=0, hidden_channels=192, num_heads=8, out_size=2, cls_head=False):
         super(Model_GT, self).__init__()
-        # self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
+        self.cnn = MobileNetV3Small_GT(out_size=hidden_channels, in_channels=in_channels)
 
         # cnn 切换为 resnet
-        resnet = torchvision.models.resnet18(pretrained=True)
-        self.cnn = nn.Sequential(*list(resnet.children())[:-2])
+        # resnet = torchvision.models.resnet18(pretrained=True)
+        # self.cnn = nn.Sequential(*list(resnet.children())[:-2])
 
 
         # use flatten, 7, 7 -> 49
@@ -94,3 +94,5 @@ class Model_GT(nn.Module):
     def unfreeze_backbone(self):
         for param in self.cnn.parameters():
             param.requires_grad = True
+
+class 
