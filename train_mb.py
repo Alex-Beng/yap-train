@@ -245,20 +245,6 @@ class MyOnlineDataSet(Dataset):
         self.pk_rt = pk_ratio
         self.pk_g_rt = pk_genshin_ratio
 
-            
-        # 创建生成图像的协程
-        # 纯纯负提升吞吐量
-        # import asyncio
-        # self.queue = asyncio.Queue()
-        # self.loop = asyncio.get_event_loop()
-        # async def generate_pure_bg_image(queue):
-        #     while True:
-        #         im, text = generate_pickup_image()
-        #         # im = transforms.ToTensor()(im)
-        #         while self.queue.qsize() > 600:
-        #             await asyncio.sleep(0.1)
-        #         await self.queue.put((im, text))
-        # self.loop.create_task(generate_pure_bg_image(self.queue))
     def get_xy(self):
         loop = self.loop
         im, text = loop.run_until_complete(self.queue.get())
@@ -268,9 +254,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        # im, text = generate_pickup_image(self.gen_func, self.pk_g_rt)
         im, text = generate_mix_image(self.gen_func, self.pk_g_rt, self.pk_rt)
-        # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
         text = text.strip()
 

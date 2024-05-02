@@ -436,14 +436,15 @@ def generate_pickup_image(rand_func=random_text, ratios: list[int, int] = [0.33,
     
     # 三部分数据，
     # 手工标注的 genshin， validate 中错误的 another，生成数据
-    if random.random() < ratios[0]:
+    rand_num = random.random()
+    if rand_num < ratios[0]:
         idx = random.randint(0, genshin_n - 1)
         text = genshin_y[idx]
         img = genshin_x_imgs[idx]
 
         img = Image.fromarray(img)
         return img, text
-    elif random.random() < ratios[0] + ratios[1]:
+    elif rand_num < ratios[0] + ratios[1]:
         idx = random.randint(0, another_n - 1)
         text = another_y[idx]
         img = another_x_imgs[idx]
