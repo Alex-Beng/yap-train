@@ -95,4 +95,3 @@ class Model_GT(nn.Module):
         for param in self.cnn.parameters():
             param.requires_grad = True
 
-class 
