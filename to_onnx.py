@@ -9,6 +9,7 @@ import json
 
 from mona.nn.model import Model
 from mona.nn.model2 import Model2
+from mona.nn.model2_mb import Model2 # TODO: mb config
 from mona.text import word_to_index, index_to_word
 from mona.datagen.datagen import generate_pure_bg_image,generate_pickup_image, generate_mix_image
 
@@ -16,7 +17,7 @@ from mona.datagen.datagen import generate_pure_bg_image,generate_pickup_image, g
 # TODO: make path configurable
 model_folder = "models"
 name = "model_training.pt"
-name = "model_best.pt"
+name = "model_best_.pt"
 # name = "model_acc100-epoch860.pt"
 # name = "model_acc9999-epoch1.pt"
 onnx_name = name.rsplit(".", 2)[0] + ".onnx"
