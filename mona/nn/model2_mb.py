@@ -77,35 +77,54 @@ from mona.text import index_to_word, word_to_index
 
 
 class Model2(nn.Module):
-    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=512, num_heads=8):
+    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=512, num_heads=8, backbone_name='resnet18'):
         super(Model2, self).__init__()
-        self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
-        self.pe = PositionalEncoding(dim=hidden_channels, length=24)
-        
-        # resnet = torchvision.models.resnet18(pretrained=True)
-        # resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-        # resnet.avgpool = nn.AdaptiveAvgPool2d((7, 7))
+        # self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
 
-        # self.cnn = nn.Sequential(*list(resnet.children())[:-3])
+        if backbone_name == 'mobile':
+            self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=3)
+            seq_len = 24
+        elif 'resnet' in backbone_name:
+            resnet = getattr(torchvision.models, backbone_name)(pretrained=True)
+            resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
+            # resnet.avgpool = nn.AdaptiveAvgPool2d((7, 7))
+            num_channels = 256 if backbone_name in ('resnet18', 'resnet34') else 1024
+            self.cnn = nn.Sequential(*list(resnet.children())[:-3], nn.Conv2d(num_channels, hidden_channels, kernel_size=1))
+            # self.cnn = nn.Sequential(*list(resnet.children())[:-3])
+            seq_len = 48
+
+        self.pe = PositionalEncoding(dim=hidden_channels, length=seq_len)
+        self.query = nn.Parameter(torch.randn(seq_len, hidden_channels))
 
         # 添加一个batchnorm
-        # self.bm = nn.BatchNorm1d(24)
+        self.bm = nn.BatchNorm1d(seq_len)
         # 添加一个dropout
         self.dp = nn.Dropout(0.2)
         self.dp2 = nn.Dropout(0.1)
         # self.linear1 = nn.Linear(256, hidden_channels)
         self.blocks = nn.Sequential()
         for i in range(depth):
-            block = MixingBlock(
-                dim=hidden_channels,
-                num_heads=num_heads,
-                is_local=False,
-                drop_path=0.0,
-                hw=None,
-                input_length=24,
-                mlp_ratio=2,
-                attention_drop=0.1,
-                drop=0.1,
+            # block = MixingBlock(
+            #     dim=hidden_channels,
+            #     num_heads=num_heads,
+            #     is_local=False,
+            #     drop_path=0.0,
+            #     hw=None,
+            #     input_length=seq_len,
+            #     mlp_ratio=2,
+            #     attention_drop=0.1,
+            #     drop=0.1,
+            # )
+            # 切换到 Transformer
+            block = nn.Transformer(
+                d_model=hidden_channels,
+                nhead=num_heads,
+                num_encoder_layers=8,
+                num_decoder_layers=6,
+                dim_feedforward=hidden_channels,
+                dropout=0.1,
+                activation="relu",
+                batch_first=False
             )
             self.blocks.add_module(f"mix{i}", block)
         self.norm = nn.LayerNorm(hidden_channels)
@@ -115,18 +134,27 @@ class Model2(nn.Module):
         x = self.cnn(x)
         # print(x.shape)
         # x = x.squeeze(2).permute((0, 2, 1))
-        x = x.flatten(2)
-        x = x.permute((0, 2, 1))
+        x = x.flatten(2)  # batch, dim, seq
         # print(x.shape)
-        # x = self.pe(x)
+        x = x.permute((0, 2, 1)) # batch, seq, dim
+        # print(x.shape)
+        x = self.pe(x)
+        x = x.permute((1, 0, 2))
+        # print(x.shape)
         # x = self.bm(x)
         # x = self.dp(x)
         # x = self.linear1(x)
-        x = self.dp(x)
-        x = self.blocks(x)
+        # x = self.dp(x)
+        # x = self.blocks(x)
+        for block in self.blocks:
+            _query = self.query.unsqueeze(1).repeat(1, x.size(1), 1)
+            # print(x.shape, _query.shape)
+            x = block(x, _query)
         x = self.norm(x)
-        x = self.linear2(x)
-        x = x.permute((1, 0, 2))
+        x = self.linear2(x) # seq, batch, lexicon_size
+        # print(x.shape)
+        # x = x.permute((0, 2, 1))
+        # print(x.shape)
 
         x = F.log_softmax(x, dim=2)
         return x
