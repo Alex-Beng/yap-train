@@ -50,9 +50,9 @@ mb_config = {
     "batch_size": 64, # 550 on 4GB gpu memo
     "epoch": 1000000,
     "print_per": 10,
-    "save_per": 400,
+    "save_per": 1600,
 
-    "train_size": 40960,
+    "train_size": 102400,
     "validate_size": 25600,
 
     "pretrain": True,
@@ -71,14 +71,14 @@ mb_config = {
     # 生成混合数据时pickup的比例
     "pickup_ratio": 0.75,
     # pickup 中 genshin 真实数据的比例，以及 validate 中错误的 another 数据比例
-    "data_genshin_ratios": [0.3, 0],
+    "data_genshin_ratios": [0.4, 0.1],
     
     # save acc 9999
     "save_acc9999": False,
 
     # backbone freeze
     # 初始训练时冻结backbone，训练一段时间后解冻
-    "freeze_backbone": False,
+    "freeze_backbone": True,
     "unfreeze_backbone_epoch": 1000,
 
     # 倒反天罡，冻结其他层，训练cnn
@@ -92,7 +92,7 @@ gt_config = {
     # 因为是正方形，所以只需要一个边长
     "side_len": 224,
     
-    "batch_size": 128,
+    "batch_size": 16,
     "epoch": 1000000,
     "print_per": 10,
     "save_per": 800,
@@ -102,7 +102,7 @@ gt_config = {
 
     "pretrain": True,
     "pretrain_name": "model_best.pt",
-    'lr': 1e-6,
+    'lr': 1e-4,
 
     # Set according to your CPU
     "dataloader_workers": 1,
@@ -115,7 +115,7 @@ gt_config = {
 
     # backbone freeze
     # 初始训练时冻结backbone，训练一段时间后解冻
-    "freeze_backbone": True,
+    "freeze_backbone": False,
     "unfreeze_backbone_epoch": 1000,
 }
 
