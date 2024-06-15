@@ -74,7 +74,7 @@ def train():
 
     # 这是现在在用的model
     # model2就是SVTR（非原版）
-    net = Model2(len(index_to_word), 1).to(device)
+    net = Model2(len(index_to_word), 1, depth=1).to(device)
 
     # net = SVTRNet(
     #     img_size=(32, 384),
@@ -102,6 +102,7 @@ def train():
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
     only_genshin = config['data_only_genshin']
+    config['train_size'] = config['batch_size'] * config['save_per']
     train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
                                     pk_ratio=config["pickup_ratio"],
                                      pk_genshin_ratio=config['data_genshin_ratios']) if config["online_train"] else MyDataSet(
@@ -163,8 +164,8 @@ def train():
             batch_size = x.size(0)
 
             y = net(x)
-
-            input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
+            
+            input_lengths = torch.full((batch_size,), 48, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)

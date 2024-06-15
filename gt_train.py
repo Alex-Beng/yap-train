@@ -34,15 +34,15 @@ def validate(net, validate_loader):
             y_hat = net(x)
 
             _, predict = torch.max(y_hat, 1)
-            correct = (predict == label).sum().item()
+            # correct = (predict == label).sum().item()
             label = label.to(device)
-            acc += (correct / label.size(0))
+            # acc += (correct / label.size(0))
 
             # calculate the L1 loss
-            loss = F.cross_entropy(y_hat, label, reduction="mean")
+            # loss = F.cross_entropy(y_hat, label, reduction="mean")
             # loss = F.l1_loss(y_hat, label, reduction="mean")
-            # loss = F.mse_loss(y_hat, label, reduction="mean")
-            # print(f"Validation loss: {loss.item()}")
+            loss = F.mse_loss(y_hat, label, reduction="mean")
+            print(f"Validation loss: {loss.item()}")
             total += loss.item()
             cnt += 1
     net.train()
@@ -53,7 +53,12 @@ def validate(net, validate_loader):
 
 
 def train():
-    net = Model_GT(3, depth=2, hidden_channels=512, out_size=4, cls_head=True).to(device)
+    net = Model_GT(
+        'resnet50',  # 'resnet50', 'resnet101', 'resnet152', 'mobile'
+        depth=1,
+        hidden_channels=512, 
+        out_size=4, 
+        cls_head=False).to(device)
 
 
     if config["pretrain"]:
@@ -126,10 +131,10 @@ def train():
             # 交叉熵 loss
             criterion = torch.nn.CrossEntropyLoss()
             # print(y.shape, target_vector.shape, target_vector)
-            loss = criterion(y, target_vector)
+            # loss = criterion(y, target_vector)
 
             # loss = F.l1_loss(y, target_vector, reduction="mean")
-            # loss = F.mse_loss(y, target_vector, reduction="mean")
+            loss = F.mse_loss(y, target_vector, reduction="mean")
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.reg_head.weight, p=1)
 
@@ -153,7 +158,8 @@ def train():
                 print(f"{cur_time} loss: {val_loss}", f"acc: {val_acc}")
                 torch.save(net.state_dict(), f"models/gt/model_training.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
-                if val_acc > curr_best_acc:
+                # if val_acc > curr_best_acc:
+                if val_loss < curr_best_loss:
                     torch.save(net.state_dict(), f"models/gt/model_best.pt")
                     curr_best_loss = val_loss
                     curr_best_acc = val_acc
@@ -196,7 +202,7 @@ class MyOnlineDataSet(Dataset):
 
     def __getitem__(self, index):
         # Generate data online
-        im, label = generate_image(expand2polar=False, cls_head=True)
+        im, label = generate_image(expand2polar=False, cls_head=False)
         # im, text = self.get_xy()
         im = transforms.ToTensor()(im)
 
