@@ -312,6 +312,14 @@ operations_names = [
     "仙像",
     "倒茶",
     "投入",
+
+    # 4.7 manually added
+    "造访神秘房间",
+    "幻想真境剧诗",
+    "抽取本期签文",
+    "更改旋律",
+    "准备演出",
+    "继续演出",
 ]
 
 def random_operation_name():
