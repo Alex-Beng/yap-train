@@ -320,6 +320,9 @@ operations_names = [
     "更改旋律",
     "准备演出",
     "继续演出",
+
+    # 雪山每日
+    "感谢信",
 ]
 
 def random_operation_name():
