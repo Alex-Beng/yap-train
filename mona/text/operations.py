@@ -323,6 +323,13 @@ operations_names = [
 
     # 雪山每日
     "感谢信",
+
+    # 鸭蛋
+    "开始演奏",
+    "募刻巧像",
+    "绘想游迹",
+    "召唤激流",
+    "放入",
 ]
 
 def random_operation_name():
