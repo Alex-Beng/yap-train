@@ -335,6 +335,8 @@ operations_names = [
     "旋转管道",
     "让魔水流动吧！",
     "就是现在",
+    "敲一敲…",
+    "我带你飞一次？",
 ]
 
 def random_operation_name():
