@@ -370,6 +370,7 @@ operations_names = [
     "算我一个！",
     "找到你啦！",
     "等待海上列车…",
+    "推一下",
 ]
 
 def random_operation_name():
