@@ -74,15 +74,29 @@ from mona.text import index_to_word, word_to_index
 #
 #         return x
 
+# 从detr超的
+# 用于当头
+class MLP(nn.Module):
+    """ Very simple multi-layer perceptron (also called FFN)"""
 
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers):
+        super().__init__()
+        self.num_layers = num_layers
+        h = [hidden_dim] * (num_layers - 1)
+        self.layers = nn.ModuleList(nn.Linear(n, k) for n, k in zip([input_dim] + h, h + [output_dim]))
+
+    def forward(self, x):
+        for i, layer in enumerate(self.layers):
+            x = F.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
+        return x
 
 class Model2(nn.Module):
-    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=512, num_heads=8, backbone_name='resnet18'):
+    def __init__(self, lexicon_size, in_channels, depth=2, hidden_channels=512, num_heads=8, backbone_name='mobile'):
         super(Model2, self).__init__()
         # self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=in_channels)
 
         if backbone_name == 'mobile':
-            self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=3)
+            self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=1)
             seq_len = 24
         elif 'resnet' in backbone_name:
             resnet = getattr(torchvision.models, backbone_name)(pretrained=True)
@@ -104,31 +118,32 @@ class Model2(nn.Module):
         # self.linear1 = nn.Linear(256, hidden_channels)
         self.blocks = nn.Sequential()
         for i in range(depth):
-            # block = MixingBlock(
-            #     dim=hidden_channels,
-            #     num_heads=num_heads,
-            #     is_local=False,
-            #     drop_path=0.0,
-            #     hw=None,
-            #     input_length=seq_len,
-            #     mlp_ratio=2,
-            #     attention_drop=0.1,
-            #     drop=0.1,
-            # )
-            # 切换到 Transformer
-            block = nn.Transformer(
-                d_model=hidden_channels,
-                nhead=num_heads,
-                num_encoder_layers=8,
-                num_decoder_layers=6,
-                dim_feedforward=hidden_channels,
-                dropout=0.1,
-                activation="relu",
-                batch_first=False
+            block = MixingBlock(
+                dim=hidden_channels,
+                num_heads=num_heads,
+                is_local=False,
+                drop_path=0.0,
+                hw=None,
+                input_length=seq_len,
+                mlp_ratio=2,
+                attention_drop=0.1,
+                drop=0.1,
             )
+            # 切换到 Transformer
+            # block = nn.Transformer(
+            #     d_model=hidden_channels,
+            #     nhead=num_heads,
+            #     num_encoder_layers=8,
+            #     num_decoder_layers=6,
+            #     dim_feedforward=hidden_channels,
+            #     dropout=0.1,
+            #     activation="relu",
+            #     batch_first=False
+            # )
             self.blocks.add_module(f"mix{i}", block)
         self.norm = nn.LayerNorm(hidden_channels)
         self.linear2 = nn.Linear(hidden_channels, lexicon_size)
+        # self.linear2 = MLP(hidden_channels, hidden_channels // 2, lexicon_size, 2)
 
     def forward(self, x):
         x = self.cnn(x)
@@ -138,22 +153,25 @@ class Model2(nn.Module):
         # print(x.shape)
         x = x.permute((0, 2, 1)) # batch, seq, dim
         # print(x.shape)
+        # x = self.dp(x)
+
         x = self.pe(x)
-        x = x.permute((1, 0, 2))
+        # x = x.permute((1, 0, 2))
         # print(x.shape)
         # x = self.bm(x)
         # x = self.dp(x)
         # x = self.linear1(x)
         # x = self.dp(x)
-        # x = self.blocks(x)
-        for block in self.blocks:
-            _query = self.query.unsqueeze(1).repeat(1, x.size(1), 1)
-            # print(x.shape, _query.shape)
-            x = block(x, _query)
+        x = self.blocks(x)
+        # for block in self.blocks:
+        #     _query = self.query.unsqueeze(1).repeat(1, x.size(1), 1)
+        #     # print(x.shape, _query.shape)
+        #     x = block(x, _query)
         x = self.norm(x)
         x = self.linear2(x) # seq, batch, lexicon_size
         # print(x.shape)
         # x = x.permute((0, 2, 1))
+        x = x.permute((1, 0, 2))
         # print(x.shape)
 
         x = F.log_softmax(x, dim=2)
