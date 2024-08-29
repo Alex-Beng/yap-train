@@ -29,5 +29,5 @@ for name in all_bk:
     if name not in black_lists:
         black_lists.append(name)
 print(black_lists)
-json.dump(black_lists, open(path, 'w', encoding='utf-8'), ensure_ascii=False)
+json.dump(black_lists, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
 

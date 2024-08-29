@@ -8,4 +8,4 @@ if len(sys.argv) < 2:
     exit(1)
 pt = sys.argv[1]
 path =  os.path.join(pt, 'all_list.json')
-json.dump(ALL_NAMES, open(path, 'w', encoding='utf-8'), ensure_ascii=False)
+json.dump(ALL_NAMES, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
