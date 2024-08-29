@@ -388,6 +388,8 @@ operations_names = [
     "准备留影",
     "用力拔",
     "更加用力拔",
+
+    "污损的快件",
 ]
 
 def random_operation_name():
