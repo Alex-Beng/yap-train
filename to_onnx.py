@@ -23,7 +23,7 @@ name = "model_best_.pt"
 onnx_name = name.rsplit(".", 2)[0] + ".onnx"
 onnx_name = "model_training.onnx"
 # net = Model(len(word_to_index))
-net = Model2(len(word_to_index), in_channels=1)
+net = Model2(len(word_to_index), in_channels=1, depth=2, hidden_channels=384, backbone_name="mobile")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 

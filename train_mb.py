@@ -57,9 +57,9 @@ def validate(net, validate_loader):
             # print(predict)
             correct += sum([1 if predict[i] == label[i] else 0 for i in range(len(label))])
             errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] and not ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")]
-            if len(errs) < 5:
+            if len(errs) < 5 and len(errs) > 0:
                 print(errs)
-            else:
+            elif len(errs) >= 5:
                 print(f'too many errors: {len(errs)}')
             total += len(label)
     net.train()
@@ -74,7 +74,7 @@ def train():
 
     # 这是现在在用的model
     # model2就是SVTR（非原版）
-    net = Model2(len(index_to_word), 1, depth=1).to(device)
+    net = Model2(len(index_to_word), 1, depth=2, hidden_channels=384, backbone_name='mobile').to(device)
 
     # net = SVTRNet(
     #     img_size=(32, 384),
@@ -128,6 +128,7 @@ def train():
     # optimizer = optim.SGD(net.parameters(), lr=config['lr'])
     # optimizer = optim.Adadelta(net.parameters())
     optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000, eta_min=0)
     # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
@@ -152,6 +153,7 @@ def train():
 
         train_cnt = 0
         for x, label in train_loader:
+            # scheduler.step()
             # sleep(10)
             optimizer.zero_grad()
             target_vector, target_lengths = get_target(label)
@@ -165,7 +167,7 @@ def train():
 
             y = net(x)
             
-            input_lengths = torch.full((batch_size,), 48, device=device, dtype=torch.long)
+            input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
@@ -187,7 +189,7 @@ def train():
                 print(f"curr best acc: {curr_best_acc}")
                 print("Validating and checkpointing")
                 rate = validate(net, validate_loader)
-                print(f"{cur_time} rate: {rate * 100}%")
+                print(f"{cur_time} rate: {rate * 100}%, curr best acc: {curr_best_acc * 100}%")
                 torch.save(net.state_dict(), f"models/model_training_mb.pt")
                 # torch.save(net.state_dict(), f"models/model_training_{batch+1}_acc{int(rate*10000)}.pt")
                 if rate == 1:

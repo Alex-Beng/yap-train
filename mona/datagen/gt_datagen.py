@@ -249,7 +249,8 @@ def generate_image(expand2polar=False, cls_head=False):
 
 if __name__ == '__main__':
     while True:
-        img, label = generate_image(expand2polar=True)
+        # img, label = generate_image(expand2polar=True)
+        img, label = gen_view_mask()
         # img.show()
         img = np.array(img)
         cv2.imshow('img', img)

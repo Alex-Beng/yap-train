@@ -47,17 +47,18 @@ mb_config = {
 
     "height": 32,
     "train_width": 384,
-    "batch_size": 64, # 550 on 4GB gpu memo
+    "batch_size": 256, # 550 on 4GB gpu memo
     "epoch": 1000000,
     "print_per": 10,
-    "save_per": 1600,
+    "save_per": 400,
 
-    "train_size": 102400,
+    "train_size": 10240, # 由 batch_size * save_per 算了
     "validate_size": 25600,
+    # "validate_size": 256,
 
     "pretrain": True,
     "pretrain_name": "model_best_.pt",
-    'lr': 1e-6,
+    'lr': 1e-4,
 
     # Set according to your CPU
     "dataloader_workers": 1,
@@ -78,7 +79,7 @@ mb_config = {
 
     # backbone freeze
     # 初始训练时冻结backbone，训练一段时间后解冻
-    "freeze_backbone": True,
+    "freeze_backbone": False,
     "unfreeze_backbone_epoch": 1000,
 
     # 倒反天罡，冻结其他层，训练cnn
