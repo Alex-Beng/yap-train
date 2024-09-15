@@ -152,3 +152,14 @@ gt_noexp_config = {
     "freeze_backbone": True,
     "unfreeze_backbone_epoch": 1000,
 }
+
+maxact_config = {
+    "device": "cuda",
+    "pretrain_name": "model_best_.pt",
+    "lr": 1e-2,
+    "iters": 100000,
+    "show_per": 10,
+    "batch_size": 30,
+    "init_tensor_method": "datagen",
+    "init_str_method": "rand",
+}
