@@ -151,6 +151,18 @@ def main():
                 break
             cv2.imwrite(f"maxact/{it}.png", img)
     
+def pics_to_video():
+    root_path = "./maxact/"
+    img_names = [f"{root_path}{i}.png" for i in range(0, 100)]
+    img_names += [f"{root_path}{i}.png" for i in range(100, 69410, 10)]
+    print(img_names[:2], img_names[-2:])
+
+    for img_name in img_names:
+        img = cv2.imread(img_name)
+        cv2.imshow("img", img)
+        cv2.waitKey(0)
+
 
 if __name__ == "__main__":
-    main()
+    # main()
+    pics_to_video()
