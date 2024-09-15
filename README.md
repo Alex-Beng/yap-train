@@ -10,6 +10,10 @@ SVTR training from Yas-Train, and CenterNet training
 
 基于yas-train二次开发的yap-train。主要的改动有：
 
+## 增加了 activation maximization 的支持
+
+见[viz_max_activation.py](./viz_max_activation.py)。非常简单的冻结模型，然后训练input并保存。
+
 
 ## 增加了CenterNet的训练支持（cannot work now）
 
