@@ -41,12 +41,14 @@ from mona.datagen.pre_process import pre_process
 # Yap需要固定字号
 fonts = [ImageFont.truetype("./assets/genshin.ttf", i) for i in range(85, 104)]
 _init = False
+bg_imgs = []
 
-def load_bg_imgs():
-    path = "./dumps_full_mona2/"
+def load_bg_imgs(path = "./dumps_full_mona2/"):
     # check path exists
     if not os.path.exists(path):
-        return []
+        print(f'path {path} not exists')
+        print(f'trying other path')
+        return load_bg_imgs("../yap/dumps_full_mona2/")
     # 获取文件夹下所有图片
     files = os.listdir(path)
     # 读取图片
