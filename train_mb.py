@@ -55,8 +55,15 @@ def validate(net, validate_loader):
             x = x.to(device)
             predict = predict_net(net, x)
             # print(predict)
-            correct += sum([1 if predict[i] == label[i] else 0 for i in range(len(label))])
-            errs = [(predict[i], label[i]) for i in range(len(label)) if predict[i] != label[i] and not ( label[i][:7] == "尚需生长时间：" and predict[i][:7] == "尚需生长时间：")]
+            def isCorrect(y, y_hat):
+                if y == y_hat:
+                    return True
+                if y[:7] == "尚需生长时间：" and y_hat[:7] == "尚需生长时间：":
+                    return True
+                return False
+
+            correct += sum([1 if isCorrect(label[i], predict[i]) else 0 for i in range(len(label))])
+            errs = [(predict[i], label[i]) for i in range(len(label)) if not isCorrect(label[i], predict[i])]
             if len(errs) < 5 and len(errs) > 0:
                 print(errs)
             elif len(errs) >= 5:
@@ -83,7 +90,7 @@ def train():
     # ).to(device)
     if config["pretrain"]:
         # net.load_state_dict(torch.load(f"models/{config['pretrain_name']}", map_location=device))
-        net.load_can_load(torch.load(f"models/{config['pretrain_name']}", map_location=device))
+        net.load_can_load(torch.load(f"models/{config['pretrain_name']}", map_location=device, weights_only=False))
 
     data_aug_transform = transforms.Compose([
         transforms.RandomApply([
@@ -102,7 +109,7 @@ def train():
         transforms.RandomApply([AddGaussianNoise(mean=0, std=1/255)], p=0.5),
     ])
     only_genshin = config['data_only_genshin']
-    config['train_size'] = config['batch_size'] * config['save_per']
+    config['train_size'] = config['batch_size'] * config['save_per'] * 8
     train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
                                     pk_ratio=config["pickup_ratio"],
                                      pk_genshin_ratio=config['data_genshin_ratios']) if config["online_train"] else MyDataSet(
@@ -129,6 +136,8 @@ def train():
     # optimizer = optim.Adadelta(net.parameters())
     optimizer = optim.AdamW(net.parameters(), lr=config['lr'])
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000, eta_min=0)
+    # 使用 cosine
+
     # optimizer = optim.RMSprop(net.parameters())
     ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True).to(device)
 
@@ -153,7 +162,7 @@ def train():
 
         train_cnt = 0
         for x, label in train_loader:
-            # scheduler.step()
+            scheduler.step()
             # sleep(10)
             optimizer.zero_grad()
             target_vector, target_lengths = get_target(label)
@@ -170,7 +179,13 @@ def train():
             input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
+            l2_lambda = 0.00005
+            l2_reg = torch.tensor(0., requires_grad=True).to(device)
+            for param in net.parameters():
+                l2_reg += torch.norm(param, p=2)
+            loss += l2_lambda * l2_reg
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
+            # loss += 0.0001 * torch.norm(net.
 
             writer.add_scalar("Train", loss.item(), train_cnt)
             train_cnt += 1

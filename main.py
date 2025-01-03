@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
         for i in range(100):
             # im, text = generate_pickup_image(random_text_genshin_distribute, 0)
-            im, text = generate_mix_image(random_text_genshin_distribute, 0)
+            im, text = generate_mix_image(random_text_genshin_distribute)
             text = text.replace("/", "_")
             text = text.replace("?", "_")
             text = text.replace(":", "_")
