@@ -162,7 +162,7 @@ def train():
 
         train_cnt = 0
         for x, label in train_loader:
-            scheduler.step()
+            
             # sleep(10)
             optimizer.zero_grad()
             target_vector, target_lengths = get_target(label)
@@ -191,6 +191,7 @@ def train():
             train_cnt += 1
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             cur_time = datetime.datetime.now()
 
