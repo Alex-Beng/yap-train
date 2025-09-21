@@ -167,11 +167,12 @@ class Model2(nn.Module):
         #     _query = self.query.unsqueeze(1).repeat(1, x.size(1), 1)
         #     # print(x.shape, _query.shape)
         #     x = block(x, _query)
-        x = self.norm(x)
-        x = self.linear2(x) # seq, batch, lexicon_size
+        x = self.norm(x) # batch, seq, feat_dim
+        # print(x.shape)
+        x = self.linear2(x) # batch, seq, lexicon_size
         # print(x.shape)
         # x = x.permute((0, 2, 1))
-        x = x.permute((1, 0, 2))
+        x = x.permute((1, 0, 2)) # seq, batch, lexicon_size
         # print(x.shape)
 
         x = F.log_softmax(x, dim=2)

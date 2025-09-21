@@ -11,7 +11,7 @@ def arr_to_string(arr):
         last_word = word
     return temp
 
-def predict(net, x):
+def predict(net, x, return_raw_pred=False):
     y = net(x)
     # y = torch.transpose(y, 0, 1)
     batch_size = x.size(0)
@@ -34,6 +34,8 @@ def predict(net, x):
         for j in indices[i]:
             word = index_to_word[j.item()]
             words.append(word)
-
-        ans.append(arr_to_string(words))
+        if not return_raw_pred:
+            ans.append(arr_to_string(words))
+        else:
+            ans.append( (arr_to_string(words), words) )
     return ans

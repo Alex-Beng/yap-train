@@ -179,11 +179,12 @@ def train():
             input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
-            l2_lambda = 0.00005
-            l2_reg = torch.tensor(0., requires_grad=True).to(device)
-            for param in net.parameters():
-                l2_reg += torch.norm(param, p=2)
-            loss += l2_lambda * l2_reg
+            # l2_lambda = 0.0004
+            # l2_reg = torch.tensor(0., requires_grad=True).to(device)
+            # for param in net.parameters():
+            #     l2_reg += torch.norm(param, p=2)
+            # loss += l2_lambda * l2_reg
+            # 添加center loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
             # loss += 0.0001 * torch.norm(net.
 
@@ -199,7 +200,7 @@ def train():
                 tput = batch_size * batch / (cur_time - start_time).total_seconds()
                 print(f"{cur_time} e{epoch} #{batch} tput: {tput:.2f} loss: {loss.item()}")
                 # print("sleeping for a while")
-                # sleep(5)
+                # sleep(2)
 
             if batch % save_per == 0 and batch != 0:
                 print(f"curr best acc: {curr_best_acc}")
@@ -261,6 +262,7 @@ class MyOnlineDataSet(Dataset):
             self.gen_func = random_text_genshin_distribute
         else:
             self.gen_func = random_text
+        self.gen_func = random_text
         self.pk_rt = pk_ratio
         self.pk_g_rt = pk_genshin_ratio
 

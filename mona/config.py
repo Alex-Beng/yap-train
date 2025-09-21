@@ -58,7 +58,7 @@ mb_config = {
 
     "pretrain": True,
     "pretrain_name": "model_best_.pt",
-    'lr': 1e-4,
+    'lr': 1e-3,
 
     # Set according to your CPU
     "dataloader_workers": 1,
