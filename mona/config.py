@@ -47,10 +47,10 @@ mb_config = {
 
     "height": 32,
     "train_width": 384,
-    "batch_size": 256, # 550 on 4GB gpu memo
+    "batch_size": 64, # 550 on 4GB gpu memo
     "epoch": 1000000,
     "print_per": 10,
-    "save_per": 400,
+    "save_per": 1000,
 
     "train_size": 10240, # 由 batch_size * save_per 算了
     "validate_size": 25600,

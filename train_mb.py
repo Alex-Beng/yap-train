@@ -51,15 +51,18 @@ def validate(net, validate_loader):
     correct = 0
     total = 0
     with torch.no_grad():
-        for x, label in validate_loader:
+        # for x, label in validate_loader:
+        # 避免磁盘io
+        for _ in range(validate_loader.batch_time):
+            x, label = next(validate_loader)
             x = x.to(device)
             predict = predict_net(net, x)
             # print(predict)
             def isCorrect(y, y_hat):
                 if y == y_hat:
                     return True
-                if y[:7] == "尚需生长时间：" and y_hat[:7] == "尚需生长时间：":
-                    return True
+                # if y[:7] == "尚需生长时间：" and y_hat[:7] == "尚需生长时间：":
+                #     return True
                 return False
 
             correct += sum([1 if isCorrect(label[i], predict[i]) else 0 for i in range(len(label))])
@@ -110,27 +113,32 @@ def train():
     ])
     only_genshin = config['data_only_genshin']
     config['train_size'] = config['batch_size'] * config['save_per'] * 8
-    train_dataset = MyOnlineDataSet(config['train_size'], is_val=only_genshin,
+    train_dataset = MyOnlineDataSet(config['train_size'] * 100, is_val=only_genshin,
                                     pk_ratio=config["pickup_ratio"],
                                      pk_genshin_ratio=config['data_genshin_ratios']) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
-    validate_dataset = MyOnlineDataSet(config['validate_size'], is_val=True, 
-                                       pk_ratio=config["pickup_ratio"],
-                                       pk_genshin_ratio=config['data_genshin_ratios']) if config["online_val"] else MyDataSet(
-        torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
+    # validate_dataset = MyOnlineDataSet(config['validate_size'] * 10, is_val=True, 
+    #                                    pk_ratio=config["pickup_ratio"],
+    #                                    pk_genshin_ratio=config['data_genshin_ratios']) if config["online_val"] else MyDataSet(
+    #     torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
     # 直接共用 loader，反正是生成数据
     train_loader = DataLoader(
-            train_dataset, shuffle=True, 
+            train_dataset, shuffle=False, 
             num_workers=config["dataloader_workers"] , 
             batch_size=config["batch_size"]
             )
     # validate_loader = train_loader
-    validate_loader = DataLoader(
-            validate_dataset, 
-            num_workers=config["dataloader_workers"], 
-            batch_size=config["batch_size"]
-            )
+    # validate_loader = DataLoader(
+    #         validate_dataset, 
+    #         num_workers=config["dataloader_workers"], 
+    #         batch_size=config["batch_size"]
+    #         )
+    train_loader = iter(train_loader)
+    validate_loader = train_loader
+    # validate_loader = iter(validate_loader)
+    train_loader.batch_time = config['train_size'] // config['batch_size']
+    validate_loader.batch_time = config['validate_size'] // config['batch_size']
 
     # optimizer = optim.SGD(net.parameters(), lr=config['lr'])
     # optimizer = optim.Adadelta(net.parameters())
@@ -161,7 +169,9 @@ def train():
             net.unfreeze_withouth_backbone()
 
         train_cnt = 0
-        for x, label in train_loader:
+        # for x, label in train_loader:
+        for _ in range(train_loader.batch_time):
+            x, label = next(train_loader)
             
             # sleep(10)
             optimizer.zero_grad()
@@ -179,11 +189,11 @@ def train():
             input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
             # 添加正则化loss
-            # l2_lambda = 0.0004
-            # l2_reg = torch.tensor(0., requires_grad=True).to(device)
-            # for param in net.parameters():
-            #     l2_reg += torch.norm(param, p=2)
-            # loss += l2_lambda * l2_reg
+            l2_lambda = 0.0001
+            l2_reg = torch.tensor(0., requires_grad=True).to(device)
+            for param in net.parameters():
+                l2_reg += torch.norm(param, p=2)
+            loss += l2_lambda * l2_reg
             # 添加center loss
             # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
             # loss += 0.0001 * torch.norm(net.
@@ -219,7 +229,9 @@ def train():
 
             batch += 1
 
-    for x, label in validate_loader:
+    # for x, label in validate_loader:
+    for _ in range(validate_loader.batch_time):
+        x, label = next(validate_loader)
         x = x.to(device)
         # predict = net.predict(x)
         predict = predict_net(net, x)
