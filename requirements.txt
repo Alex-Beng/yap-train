@@ -1,0 +1,28 @@
+--extra-index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu128/
+--extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple
+--trusted-host mirror.sjtu.edu.cn
+--trusted-host pypi.tuna.tsinghua.edu.cn
+
+# pytorch (CUDA 12.8, RTX 50 系 Blackwell)
+torch==2.9.1+cu128
+torchvision==0.24.1+cu128
+
+# train
+numpy==2.5.3
+opencv-python==5.0.0.93
+pillow==12.3.0
+tqdm==4.70.1
+
+# export / infer
+onnx==1.23.2
+onnxruntime==1.31.0
+
+# scripts
+lxml==6.1.3
+requests==2.34.2
+
+# dev tools
+ipython==9.17.1
+torchlens==2.36.0
+torchsummary==1.5.1
+pyperclip==1.11.0

@@ -23,6 +23,12 @@ def load_npc_names(path):
     return sorted(set(names))
 
 
+type_code_suffix = (
+    r'女|男|成女|成男|少女|少年|小孩|老人|兽怪|剧团成男|贵族壮汉|贵族成男|'
+    r'矮灵女|矮灵男|矮灵|壮汉|风仙女|风仙男|风仙|雪精|胖兽怪|红衣|工程服|仆从'
+)
+
+
 def valid_word(wd):
     if not wd:
         return False
@@ -41,6 +47,14 @@ def valid_word(wd):
     if '?' in wd:
         return False
     if any(ch in wd for ch in '()（）{}… \u3000'):
+        return False
+    # 过滤遮挡/占位词
+    if '■' in wd or '【' in wd or '】' in wd:
+        return False
+    if '测试' in wd or '废弃' in wd:
+        return False
+    # 过滤带类型代号后缀的内部角色名，如 剧院观众-成男 / 愚人众-女-红衣
+    if re.search(r'-(' + type_code_suffix + r')(-|$)', wd):
         return False
     return True
 
