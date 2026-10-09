@@ -97,7 +97,7 @@ class Model2(nn.Module):
 
         if backbone_name == 'mobile':
             self.cnn = MobileNetV3Small(out_size=hidden_channels, in_channels=1)
-            seq_len = 24
+            seq_len = 48
         elif 'resnet' in backbone_name:
             resnet = getattr(torchvision.models, backbone_name)(pretrained=True)
             resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)

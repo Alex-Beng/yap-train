@@ -62,8 +62,7 @@ class MyOnlineDataSet(Dataset):
         self.hard_words = words
     
     def rand_fn(self):
-        return ''.join(random.choices(self.hard_words, k=random.randint(1, 2)))
-
+        return ''.join(random.choices(self.hard_words, k=random.randint(1, 6)))
 
 if __name__ == "__main__":
     # crnn
@@ -134,15 +133,18 @@ if __name__ == "__main__":
                         else:
                             char_center[index] = [feat[idx_time], 1]
             # Stats
-            print(f"conv rate: {len(char_center)} / {len(index_to_word)} ")
+            min_cnt = min([char_center[p][1] for p in char_center])
+            max_cnt = sorted([char_center[p][1] for p in char_center])[-2]
+            print(f"conv rate: {len(char_center)} / {len(index_to_word)} , {min_cnt}-{max_cnt}")
             # get the words
             left_idexs = set(index_to_word.keys()) - set(char_center.keys())
             left_words = [index_to_word[i] for i in left_idexs]
             if len(left_words) < 300:
+                # pass
                 validate_loader.dataset.set_hard_word(left_words)
-                print(left_words)
+                # print(left_words)
 
-            if len(left_words) == 0 and min([p[1] for p in char_center]) > 10:
+            if len(left_words) == 0 and min_cnt > 0:
                 break
 
         # embed()

@@ -89,7 +89,7 @@ class MobileNetV3Small(nn.Module):
         super(MobileNetV3Small, self).__init__()
 
         self.conv = nn.Sequential(
-            nn.Conv2d(in_channels, 16, kernel_size=(3, 3), stride=(2, 2), padding=1), # -> H // 2, W // 2
+            nn.Conv2d(in_channels, 16, kernel_size=(3, 3), stride=(2, 1), padding=1), # -> H // 2, W (seq_len x2)
             nn.BatchNorm2d(16),
             nn.Hardswish(),
 

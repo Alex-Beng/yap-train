@@ -84,7 +84,7 @@ def train():
 
     # 这是现在在用的model
     # model2就是SVTR（非原版）
-    net = Model2(len(index_to_word), 1, depth=2, hidden_channels=384, backbone_name='mobile').to(device)
+    net = Model2(len(index_to_word), 1, depth=2, hidden_channels=512, backbone_name='mobile').to(device)
 
     # net = SVTRNet(
     #     img_size=(32, 384),
@@ -117,26 +117,23 @@ def train():
                                     pk_ratio=config["pickup_ratio"],
                                      pk_genshin_ratio=config['data_genshin_ratios']) if config["online_train"] else MyDataSet(
         torch.load("data/train_x.pt"), torch.load("data/train_label.pt"))
-    # validate_dataset = MyOnlineDataSet(config['validate_size'] * 10, is_val=True, 
-    #                                    pk_ratio=config["pickup_ratio"],
-    #                                    pk_genshin_ratio=config['data_genshin_ratios']) if config["online_val"] else MyDataSet(
-    #     torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
+    validate_dataset = MyOnlineDataSet(config['validate_size'] * 100, is_val=True,
+                                       pk_ratio=config["pickup_ratio"],
+                                       pk_genshin_ratio=config['data_genshin_ratios']) if config["online_val"] else MyDataSet(
+        torch.load("data/validate_x.pt"), torch.load("data/validate_label.pt"))
 
-    # 直接共用 loader，反正是生成数据
     train_loader = DataLoader(
             train_dataset, shuffle=False, 
             num_workers=config["dataloader_workers"] , 
             batch_size=config["batch_size"]
             )
-    # validate_loader = train_loader
-    # validate_loader = DataLoader(
-    #         validate_dataset, 
-    #         num_workers=config["dataloader_workers"], 
-    #         batch_size=config["batch_size"]
-    #         )
+    validate_loader = DataLoader(
+            validate_dataset, shuffle=False,
+            num_workers=config["dataloader_workers"],
+            batch_size=config["batch_size"]
+            )
     train_loader = iter(train_loader)
-    validate_loader = train_loader
-    # validate_loader = iter(validate_loader)
+    validate_loader = iter(validate_loader)
     train_loader.batch_time = config['train_size'] // config['batch_size']
     validate_loader.batch_time = config['validate_size'] // config['batch_size']
 
@@ -186,23 +183,13 @@ def train():
 
             y = net(x)
             
-            input_lengths = torch.full((batch_size,), 24, device=device, dtype=torch.long)
+            input_lengths = torch.full((batch_size,), 48, device=device, dtype=torch.long)
             loss = ctc_loss(y, target_vector, input_lengths, target_lengths)
-            # 添加正则化loss
-            l2_lambda = 0.0001
-            l2_reg = torch.tensor(0., requires_grad=True).to(device)
-            for param in net.parameters():
-                l2_reg += torch.norm(param, p=2)
-            loss += l2_lambda * l2_reg
-            # 添加center loss
-            # loss += 0.0001 * torch.norm(net.linear2.weight, p=2)
-            # loss += 0.0001 * torch.norm(net.
 
             writer.add_scalar("Train", loss.item(), train_cnt)
             train_cnt += 1
             loss.backward()
             optimizer.step()
-            scheduler.step()
 
             cur_time = datetime.datetime.now()
 
@@ -210,7 +197,7 @@ def train():
                 tput = batch_size * batch / (cur_time - start_time).total_seconds()
                 print(f"{cur_time} e{epoch} #{batch} tput: {tput:.2f} loss: {loss.item()}")
                 # print("sleeping for a while")
-                # sleep(2)
+                sleep(2)
 
             if batch % save_per == 0 and batch != 0:
                 print(f"curr best acc: {curr_best_acc}")
@@ -228,6 +215,8 @@ def train():
                     curr_best_acc = rate
 
             batch += 1
+
+        scheduler.step()
 
     # for x, label in validate_loader:
     for _ in range(validate_loader.batch_time):
